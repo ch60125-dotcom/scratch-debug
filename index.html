@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>遊樂園搶修｜Scratch 除錯大作戰</title>
+<script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly_compressed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/msg/zh-hant.js"></script>
+<style>
+:root{--bg:#FFF6E5;--ink:#2b2440;--sub:#6b6280;--card:#fff;--line:#eadfcb;--pri:#ff7a59;--pri2:#ffb703;--ok:#2bb673;--bad:#e5484d;--blue:#4C97FF}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;font-size:15px}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+.screen{display:none;height:100vh;flex-direction:column}
+.screen.on{display:flex}
+.btn{border:0;border-radius:10px;padding:8px 14px;background:var(--pri);color:#fff;font-weight:bold;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.ok{background:var(--ok)}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.card{background:var(--card);border-radius:16px;box-shadow:0 2px 10px rgba(80,50,0,.08)}
+.top{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#fff;border-bottom:3px solid var(--line);min-height:56px;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:900;color:var(--pri)}
+.sp{flex:1}
+.pill{background:#fff3d6;border-radius:20px;padding:5px 12px;font-size:14px;white-space:nowrap}
+.badge{display:inline-block;border-radius:8px;padding:2px 8px;font-size:13px;background:#eef3ff;color:#2d5bd7;margin-left:6px;vertical-align:middle}
+/* 登入 */
+#scrLogin{align-items:center;justify-content:center;background:linear-gradient(#bfe8ff,#fff6e5)}
+.loginCard{width:min(440px,92vw);padding:28px;text-align:center}
+.loginCard h1{margin:6px 0 4px;font-size:30px;color:var(--pri)}
+.loginCard .big{font-size:64px}
+.field{display:flex;gap:8px;align-items:center;margin:10px 0;text-align:left}
+.field label{width:64px;font-weight:bold}
+.field input{flex:1;border:2px solid var(--line);border-radius:10px;padding:9px 10px;font-size:16px;font-family:inherit}
+.err{color:var(--bad);min-height:22px;font-size:14px}
+.linkb{background:none;border:0;color:#2d5bd7;text-decoration:underline;padding:4px}
+/* 地圖 */
+.mapMain{flex:1;display:flex;gap:14px;padding:14px;min-height:0}
+#mapSvg{flex:1;min-width:0;display:flex;align-items:center;justify-content:center}
+#mapSvg svg{width:100%;height:100%;max-height:calc(100vh - 90px)}
+#zonePanel{width:340px;padding:18px;overflow:auto}
+.zoneNode{cursor:pointer}
+.zoneNode.locked{cursor:not-allowed}
+.pulse{animation:pulse 1.6s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.lvList{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.lvBtn{display:flex;align-items:center;gap:10px;text-align:left;border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px}
+.lvBtn:hover:not(:disabled){border-color:var(--pri)}
+.lvBtn:disabled{opacity:.5;cursor:not-allowed}
+.lvBtn .n{font-weight:900;color:var(--pri);width:34px}
+.lvBtn .t{flex:1}
+.lvBtn .s{font-size:13px;color:var(--sub)}
+/* 關卡 */
+.lvMain{flex:1;display:grid;grid-template-columns:300px 1fr 404px;gap:10px;padding:10px;min-height:0}
+.task{padding:14px 16px;overflow:auto}
+.task h3{margin:4px 0 6px;font-size:16px}
+.task p{margin:4px 0 10px;line-height:1.6}
+.zoneTag{font-size:13px;color:var(--sub);margin-bottom:4px}
+.goal{background:#eafaf0;border:2px solid #bfe9cf;border-radius:12px;padding:8px 12px;margin:8px 0}
+.goal p{margin:4px 0}
+.how{background:#f3f0ff;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.55;margin:8px 0}
+.quizQ{font-weight:bold;margin:12px 0 6px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;text-align:left;font-size:15px}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt.chip{color:#fff;border:0;font-weight:bold;border-radius:10px}
+.opt.wrong{opacity:.45;text-decoration:line-through}
+.opt.right{outline:3px solid var(--ok)}
+.fb{margin:10px 0;border-radius:12px;padding:0;font-size:14px;line-height:1.55}
+.fb.show{padding:9px 12px}
+.fb.bad{background:#ffecec;color:#a32020}
+.fb.good{background:#e7f8ee;color:#16683c}
+.fb.info{background:#fff6d8;color:#6b4e00}
+.hintItem{background:#fffbe8;border:2px dashed #f2cf63;border-radius:12px;padding:8px 10px;margin:6px 0;font-size:14px;line-height:1.5;cursor:default}
+.hintItem.clk{cursor:pointer}
+.taskBtns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.wsCol{display:flex;flex-direction:column;min-width:0;min-height:0}
+.tabs{display:flex;gap:6px}
+.tab{border:2px solid var(--line);border-bottom:0;background:#f6f1e6;border-radius:12px 12px 0 0;padding:6px 14px;font-weight:bold}
+.tab.on{background:#fff;color:var(--pri)}
+#wsWrap{flex:1;position:relative;border-radius:0 14px 14px 14px;overflow:hidden;border:2px solid var(--line);background:#fff}
+.tabs:empty+#wsWrap{border-radius:14px}
+#ws{position:absolute;inset:0}
+.stCol{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto}
+.stBar{display:flex;align-items:center;gap:6px}
+.flag,.stopb{width:44px;height:38px;border-radius:10px;border:2px solid var(--line);background:#fff;font-size:20px;padding:0}
+.flag{background:#e9fbe9;border-color:#8fd18f}
+.flag:disabled{opacity:.4;cursor:not-allowed}
+.stage{border:3px solid #cfd6e6;border-radius:12px;overflow:hidden;background:#fff;line-height:0}
+#cv{width:100%;height:auto;display:block;cursor:pointer}
+.tests{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
+.tests button{border:2px solid var(--line);background:#fff;border-radius:20px;padding:4px 10px;font-size:13px}
+.tests button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.stNote{font-size:13px;color:var(--sub);line-height:1.5}
+/* 視窗 */
+.modalBg{position:fixed;inset:0;background:rgba(30,20,50,.45);display:none;align-items:center;justify-content:center;z-index:50}
+.modalBg.on{display:flex}
+.modal{background:#fff;border-radius:20px;padding:22px 26px;width:min(560px,94vw);max-height:90vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.modal h2{margin:0 0 10px}
+.modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.modal ul{padding-left:22px;line-height:1.8}
+.scoreTbl{width:100%;border-collapse:collapse;margin:10px 0}
+.scoreTbl td{padding:6px 4px;border-bottom:1px solid #f0e8da}
+.scoreTbl td:last-child{text-align:right;font-weight:bold}
+.scoreTbl tr.tot td{font-size:18px;color:var(--pri);border-bottom:0}
+.explain{background:#eef6ff;border-radius:12px;padding:10px 14px;line-height:1.6}
+.board{width:100%;border-collapse:collapse}
+.board th,.board td{padding:7px 6px;text-align:center;border-bottom:1px solid #f0e8da}
+.board th{background:#fff3d6}
+.board tr.me td{background:#e7f8ee;font-weight:bold}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2440;color:#fff;padding:10px 18px;border-radius:12px;opacity:0;transition:.3s;pointer-events:none;z-index:60;font-size:15px}
+#toast.on{opacity:1}
+/* 老師投影 */
+#scrBoard{background:linear-gradient(#141b4d,#3b2a6b);color:#fff}
+#scrBoard .top{background:transparent;border:0;color:#fff}
+.bigBoard{flex:1;overflow:auto;padding:10px 40px 30px}
+.bigBoard .board{font-size:24px;color:#fff}
+.bigBoard .board th{background:rgba(255,255,255,.15)}
+.bigBoard .board td{border-color:rgba(255,255,255,.15)}
+.blocklyText{font-weight:bold}
+</style>
+</head>
+<body>
+
+<!-- 登入 -->
+<div id="scrLogin" class="screen">
+  <div class="card loginCard">
+    <div class="big">🎡🐛🔧</div>
+    <h1>遊樂園搶修</h1>
+    <div style="color:var(--sub);margin-bottom:14px">Scratch 除錯大作戰</div>
+    <div id="lastBox"></div>
+    <div class="field"><label>班級</label><input id="inCls" inputmode="numeric" maxlength="4" placeholder="例如 501"></div>
+    <div class="field"><label>座號</label><input id="inSeat" inputmode="numeric" maxlength="2" placeholder="例如 7"></div>
+    <div class="field"><label>名字</label><input id="inNick" maxlength="8" placeholder="名字或暱稱（8 個字內）"></div>
+    <div class="err" id="loginErr"></div>
+    <button class="btn" id="btnLogin" style="width:100%;font-size:18px;padding:12px">🔧 開始搶修！</button>
+    <div style="margin-top:12px"><button class="linkb" id="btnTeacher">👩‍🏫 老師投影排行榜</button></div>
+  </div>
+</div>
+
+<!-- 地圖 -->
+<div id="scrMap" class="screen">
+  <header class="top">
+    <div class="brand">🎡 遊樂園搶修</div><div class="sp"></div>
+    <div class="pill" id="mapPlayer"></div>
+    <div class="pill">⭐ <b id="mapScore">0</b> 分</div>
+    <div class="pill">🔧 <b id="mapDone">0</b> / 20 關</div>
+    <button class="btn ghost small" id="btnBoard">🏆 排行榜</button>
+    <button class="btn ghost small" id="btnStory">📜 故事</button>
+    <button class="btn ghost small" id="btnLogout">換人</button>
+  </header>
+  <main class="mapMain"><div id="mapSvg"></div><aside id="zonePanel" class="card"></aside></main>
+</div>
+
+<!-- 關卡 -->
+<div id="scrLevel" class="screen">
+  <header class="top">
+    <button class="btn ghost small" id="btnBack">← 地圖</button>
+    <div style="font-size:18px"><span id="lvId" style="color:var(--pri);font-weight:900"></span> <b id="lvName"></b><span id="lvMode" class="badge"></span></div>
+    <div class="sp"></div>
+    <div class="pill">⏱ <b id="lvTime">0:00</b></div>
+    <div class="pill" id="lvPot"></div>
+    <button class="btn small" id="btnHint" style="background:var(--pri2);color:#4a3300">💡 提示</button>
+    <button class="btn ghost small" id="btnSkip">⏭ 跳過</button>
+  </header>
+  <main class="lvMain">
+    <section id="task" class="card task"></section>
+    <section class="wsCol"><div id="tabs" class="tabs"></div><div id="wsWrap"><div id="ws"></div></div></section>
+    <section class="stCol">
+      <div class="stBar">
+        <button id="btnGo" class="flag" title="執行（綠旗）">🏁</button>
+        <button id="btnStop" class="stopb" title="停止">⏹</button>
+        <div class="sp"></div>
+        <button class="btn small ghost" id="btnDemo">👀 看正確效果</button>
+        <button class="btn small ghost" id="btnReset">🔄 重置舞台</button>
+      </div>
+      <div class="stage"><canvas id="cv" width="480" height="360"></canvas></div>
+      <div id="tests" class="tests"></div>
+      <div id="stNote" class="stNote"></div>
+    </section>
+  </main>
+</div>
+
+<!-- 老師投影排行榜 -->
+<div id="scrBoard" class="screen">
+  <header class="top">
+    <div class="brand" style="font-size:30px;color:#ffd166">🏆 遊樂園搶修 排行榜</div><div class="sp"></div>
+    <span>班級：</span><input id="boardCls" maxlength="4" placeholder="全部" style="width:90px;font-size:18px;padding:6px;border-radius:8px;border:0">
+    <span id="boardTime" style="opacity:.7;font-size:14px"></span>
+    <button class="btn small" id="boardExit">離開</button>
+  </header>
+  <div class="bigBoard" id="bigBoard">讀取中…</div>
+</div>
+
+<div id="modal" class="modalBg"><div class="modal" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   ★ 老師可修改區 ★
+   SCRIPT_URL：排行榜 Google Apps Script 網址（留空＝不使用排行榜）
+   ===================================================================== */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrISkMUopfPdz6iDG6Y8dvGli7mM7JT5drOmWfoUXoEhdlg9QALYmnI2InCTESmf1khQ/exec';
+
+/* ---------------- 小工具 ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtT = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+const clone = o => JSON.parse(JSON.stringify(o));
+function toast(msg, ms) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), ms || 2200); }
+function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+let modalClose = null;
+function openModal(html, onClose) { $('#modalBox').innerHTML = html; $('#modal').classList.add('on'); modalClose = onClose || null; }
+function closeModal() { $('#modal').classList.remove('on'); const f = modalClose; modalClose = null; if (f) f(); }
+function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); }
+
+/* =====================================================================
+   積木 DSL（用來寫關卡程式）
+   ===================================================================== */
+const num = v => (v && typeof v === 'object') ? { shadow: { type: 'num', fields: { NUM: 0 } }, block: v } : { shadow: { type: 'num', fields: { NUM: v } } };
+const txt = v => (v && typeof v === 'object') ? { shadow: { type: 'txt', fields: { TXT: '' } }, block: v } : { shadow: { type: 'txt', fields: { TXT: String(v) } } };
+function chain(arr) { arr = arr.filter(Boolean); for (let i = arr.length - 2; i >= 0; i--) arr[i].next = { block: arr[i + 1] }; return arr[0]; }
+const sub = arr => arr && arr.length ? { block: chain(arr) } : undefined;
+const bool = c => c ? { block: c } : undefined;
+function blk(type, inputs, fields) { const b = { type }; if (inputs) { const o = {}; for (const k in inputs) if (inputs[k]) o[k] = inputs[k]; if (Object.keys(o).length) b.inputs = o; } if (fields) b.fields = fields; return b; }
+function hat(type, fields, body) { const h = blk(type, null, fields); if (body.length) h.next = { block: chain(body) }; return h; }
+const K = {
+  flag: (...b) => hat('ev_flag', null, b),
+  click: (...b) => hat('ev_click', null, b),
+  recv: (m, ...b) => hat('ev_recv', { MSG: m }, b),
+  bcast: m => blk('ev_bcast', null, { MSG: m }),
+  move: n => blk('mo_move', { N: num(n) }),
+  right: n => blk('mo_right', { N: num(n) }),
+  left: n => blk('mo_left', { N: num(n) }),
+  goto: (x, y) => blk('mo_goto', { X: num(x), Y: num(y) }),
+  point: d => blk('mo_point', { N: num(d) }),
+  xpos: () => blk('mo_x'),
+  sayfor: (s, n) => blk('lo_sayfor', { S: txt(s), N: num(n) }),
+  say: s => blk('lo_say', { S: txt(s) }),
+  show: () => blk('lo_show'),
+  hide: () => blk('lo_hide'),
+  clear: () => blk('pe_clear'),
+  pdown: () => blk('pe_down'),
+  pup: () => blk('pe_up'),
+  wait: n => blk('ct_wait', { N: num(n) }),
+  rep: (n, ...b) => blk('ct_repeat', { N: num(n), DO: sub(b) }),
+  forever: (...b) => blk('ct_forever', { DO: sub(b) }),
+  iff: (c, ...b) => blk('ct_if', { COND: bool(c), DO: sub(b) }),
+  ifelse: (c, a, e) => blk('ct_ifelse', { COND: bool(c), DO: sub(a), ELSE: sub(e) }),
+  stop: () => blk('ct_stop'),
+  gt: (a, b) => blk('op_gt', { A: num(a), B: num(b) }),
+  lt: (a, b) => blk('op_lt', { A: num(a), B: num(b) }),
+  eq: (a, b) => blk('op_eq', { A: num(a), B: num(b) }),
+  or: (a, b) => blk('op_or', { A: bool(a), B: bool(b) }),
+  setv: (v, n) => blk('va_set', { N: num(n) }, { VAR: v }),
+  chg: (v, n) => blk('va_change', { N: num(n) }, { VAR: v }),
+  getv: v => blk('va_get', null, { VAR: v }),
+  lclear: l => blk('li_clear', null, { LIST: l }),
+  ladd: (s, l) => blk('li_add', { S: txt(s) }, { LIST: l }),
+  llen: l => blk('li_len', null, { LIST: l }),
+};
+const id = (b, i) => (b.id = i, b);
+const at = (x, y, b) => (b.x = x, b.y = y, b);
+
+/* =====================================================================
+   Blockly 積木外觀（Scratch 風格）
+   ===================================================================== */
+const COL = { motion: '#4C97FF', looks: '#9966FF', events: '#FFBF00', control: '#FFAB19', ops: '#59C059', vars: '#FF8C1A', lists: '#FF661A', pen: '#0FBD8C' };
+const NUMCK = ['Number', 'String'];
+let CUR = null; // 目前關卡狀態
+const optVar = () => ((CUR && CUR.L.varNames) || ['變數']).map(v => [v, v]);
+const optList = () => ((CUR && CUR.L.listNames) || ['清單']).map(v => [v, v]);
+const optMsg = () => ((CUR && CUR.L.messages) || ['訊息1']).map(v => [v, v]);
+function defBlocks() {
+  const J = (type, json, isHat) => { Blockly.Blocks[type] = { init() { this.jsonInit(json); if (isHat) this.hat = 'cap'; } }; };
+  const V = n => ({ type: 'input_value', name: n, check: NUMCK });
+  const B = n => ({ type: 'input_value', name: n, check: 'Boolean' });
+  const ST = n => ({ type: 'input_statement', name: n });
+  const stmt = (type, msg, args, cat) => J(type, { message0: msg, args0: args || [], colour: COL[cat], inputsInline: true, previousStatement: null, nextStatement: null });
+  J('num', { message0: '%1', args0: [{ type: 'field_number', name: 'NUM', value: 0 }], output: null, colour: '#ffffff' });
+  J('txt', { message0: '%1', args0: [{ type: 'field_input', name: 'TXT', text: '' }], output: null, colour: '#ffffff' });
+  J('ev_flag', { message0: '當 🏁 被點擊', colour: COL.events, nextStatement: null }, true);
+  J('ev_click', { message0: '當角色被點擊', colour: COL.events, nextStatement: null }, true);
+  stmt('mo_move', '移動 %1 點', [V('N')], 'motion');
+  stmt('mo_right', '右轉 ↻ %1 度', [V('N')], 'motion');
+  stmt('mo_left', '左轉 ↺ %1 度', [V('N')], 'motion');
+  stmt('mo_goto', '定位到 x: %1 y: %2', [V('X'), V('Y')], 'motion');
+  stmt('mo_point', '面朝 %1 度', [V('N')], 'motion');
+  J('mo_x', { message0: 'x 座標', output: 'Number', colour: COL.motion });
+  stmt('lo_sayfor', '說出 %1 持續 %2 秒', [V('S'), V('N')], 'looks');
+  stmt('lo_say', '說出 %1', [V('S')], 'looks');
+  stmt('lo_show', '顯示', [], 'looks');
+  stmt('lo_hide', '隱藏', [], 'looks');
+  stmt('pe_clear', '筆跡全部清除', [], 'pen');
+  stmt('pe_down', '下筆', [], 'pen');
+  stmt('pe_up', '停筆', [], 'pen');
+  stmt('ct_wait', '等待 %1 秒', [V('N')], 'control');
+  J('ct_repeat', { message0: '重複 %1 次', args0: [V('N')], message1: '%1', args1: [ST('DO')], colour: COL.control, previousStatement: null, nextStatement: null, inputsInline: true });
+  J('ct_forever', { message0: '不停重複', message1: '%1', args1: [ST('DO')], colour: COL.control, previousStatement: null });
+  J('ct_if', { message0: '如果 %1 那麼', args0: [B('COND')], message1: '%1', args1: [ST('DO')], colour: COL.control, previousStatement: null, nextStatement: null, inputsInline: true });
+  J('ct_ifelse', { message0: '如果 %1 那麼', args0: [B('COND')], message1: '%1', args1: [ST('DO')], message2: '否則', message3: '%1', args3: [ST('ELSE')], colour: COL.control, previousStatement: null, nextStatement: null, inputsInline: true });
+  J('ct_stop', { message0: '停止 全部', colour: COL.control, previousStatement: null });
+  J('op_gt', { message0: '%1 > %2', args0: [V('A'), V('B')], output: 'Boolean', colour: COL.ops, inputsInline: true });
+  J('op_lt', { message0: '%1 < %2', args0: [V('A'), V('B')], output: 'Boolean', colour: COL.ops, inputsInline: true });
+  J('op_eq', { message0: '%1 = %2', args0: [V('A'), V('B')], output: 'Boolean', colour: COL.ops, inputsInline: true });
+  J('op_or', { message0: '%1 或 %2', args0: [B('A'), B('B')], output: 'Boolean', colour: COL.ops, inputsInline: true });
+  const D = (type, cat, kind, build) => {
+    Blockly.Blocks[type] = { init() {
+      build(this); this.setColour(COL[cat]); this.setInputsInline(true);
+      if (kind === 'stmt') { this.setPreviousStatement(true); this.setNextStatement(true); }
+      else if (kind === 'hat') { this.setNextStatement(true); this.hat = 'cap'; }
+      else this.setOutput(true, null);
+    } };
+  };
+  const dd = f => new Blockly.FieldDropdown(f);
+  D('ev_recv', 'events', 'hat', b => b.appendDummyInput().appendField('當我收到').appendField(dd(optMsg), 'MSG'));
+  D('ev_bcast', 'events', 'stmt', b => b.appendDummyInput().appendField('廣播').appendField(dd(optMsg), 'MSG'));
+  D('va_set', 'vars', 'stmt', b => { b.appendDummyInput().appendField('變數').appendField(dd(optVar), 'VAR').appendField('設為'); b.appendValueInput('N').setCheck(NUMCK); });
+  D('va_change', 'vars', 'stmt', b => { b.appendDummyInput().appendField('變數').appendField(dd(optVar), 'VAR').appendField('改變'); b.appendValueInput('N').setCheck(NUMCK); });
+  D('va_get', 'vars', 'rep', b => b.appendDummyInput().appendField(dd(optVar), 'VAR'));
+  D('li_clear', 'lists', 'stmt', b => b.appendDummyInput().appendField('刪除').appendField(dd(optList), 'LIST').appendField('的所有項目'));
+  D('li_add', 'lists', 'stmt', b => { b.appendDummyInput().appendField('新增'); b.appendValueInput('S').setCheck(NUMCK); b.appendDummyInput().appendField('到').appendField(dd(optList), 'LIST'); });
+  D('li_len', 'lists', 'rep', b => b.appendDummyInput().appendField(dd(optList), 'LIST').appendField('的項目數量'));
+}
+
+/* =====================================================================
+   執行引擎（解讀積木並在舞台上執行）
+   ===================================================================== */
+class StopErr extends Error {}
+const wrapDir = d => { d = ((d + 180) % 360 + 360) % 360 - 180; return d === -180 ? 180 : d; };
+const isNum = v => v !== '' && v !== null && !isNaN(Number(v));
+function cmp(a, b) { if (isNum(a) && isNum(b)) return Number(a) - Number(b); a = String(a).toLowerCase(); b = String(b).toLowerCase(); return a < b ? -1 : a > b ? 1 : 0; }
+function makeWorld(L, over) {
+  over = over || {};
+  const w = {
+    sprites: L.sprites.map((s, i) => ({ idx: i, name: s.name, emoji: s.emoji, x: s.x, y: s.y, dir: s.dir == null ? 90 : s.dir, visible: s.visible !== false, size: s.size || 60, rotate: !!s.rotate, faceLeft: !!s.faceLeft, runFirst: !!s.runFirst, say: '', pen: false, penColor: s.penColor || '#e83e8c', turned: 0 })),
+    vars: clone(L.vars || {}), lists: clone(L.lists || {}), lines: [],
+  };
+  if (over.vars) Object.assign(w.vars, over.vars);
+  if (over.lists) Object.assign(w.lists, clone(over.lists));
+  return w;
+}
+class Runtime {
+  constructor(L, w, o) { this.L = L; this.w = w; this.fast = !!o.fast; this.progs = o.progs; this.onBlock = o.onBlock; this.maxMs = o.maxMs || L.maxMs || 12000; this.trace = []; this.threads = new Set(); this.wakers = new Set(); this.stopped = false; this.stopAll = false; this.timedOut = false; this.steps = 0; this.t0 = performance.now(); }
+  log(e) { this.trace.push(e); }
+  hats(type, pred, onlySp) { const out = []; this.w.sprites.forEach((sp, i) => { if (onlySp && onlySp !== sp) return; for (const t of (this.progs[i] || [])) if (t.type === type && (!pred || pred(t))) out.push([sp, t]); }); return out; }
+  spawn(sp, top) {
+    const p = (async () => { try { await this.exec(top.next && top.next.block, sp); } catch (e) { if (!(e instanceof StopErr)) console.error(e); } })();
+    this.threads.add(p); p.finally(() => this.threads.delete(p));
+  }
+  async start(type, sp) {
+    const list = this.hats(type || 'ev_flag', null, sp);
+    list.sort((a, b) => (b[0].runFirst ? 1 : 0) - (a[0].runFirst ? 1 : 0));
+    for (const [s, t] of list) this.spawn(s, t);
+    await this.done();
+  }
+  async done() { while (this.threads.size) await Promise.allSettled([...this.threads]); }
+  stop() { this.stopped = true; this.wakers.forEach(r => r()); this.wakers.clear(); }
+  check() {
+    if (this.stopped) throw new StopErr();
+    this.steps++;
+    if (this.fast ? this.steps > 30000 : performance.now() - this.t0 > this.maxMs) { this.timedOut = true; this.stop(); throw new StopErr(); }
+  }
+  sleep(ms) { if (this.fast || ms <= 0) return Promise.resolve(); return new Promise(r => { const w = () => { clearTimeout(t); this.wakers.delete(w); r(); }; const t = setTimeout(w, ms); this.wakers.add(w); }); }
+  frame() { if (this.fast) return Promise.resolve(); return new Promise(r => requestAnimationFrame(() => r())); }
+  inp(b, n) { const i = b.inputs && b.inputs[n]; return i ? (i.block || i.shadow) : null; }
+  val(b, n, sp) { const t = this.inp(b, n); return t ? this.rep(t, sp) : 0; }
+  cond(b, n, sp) { const t = this.inp(b, n); return t ? !!this.rep(t, sp) : false; }
+  rep(b, sp) {
+    const f = b.fields || {};
+    switch (b.type) {
+      case 'num': return Number(f.NUM) || 0;
+      case 'txt': return f.TXT == null ? '' : f.TXT;
+      case 'mo_x': return Math.round(sp.x);
+      case 'va_get': return this.w.vars[f.VAR] == null ? 0 : this.w.vars[f.VAR];
+      case 'li_len': return (this.w.lists[f.LIST] || []).length;
+      case 'op_gt': return cmp(this.val(b, 'A', sp), this.val(b, 'B', sp)) > 0;
+      case 'op_lt': return cmp(this.val(b, 'A', sp), this.val(b, 'B', sp)) < 0;
+      case 'op_eq': return cmp(this.val(b, 'A', sp), this.val(b, 'B', sp)) === 0;
+      case 'op_or': return this.cond(b, 'A', sp) || this.cond(b, 'B', sp);
+    }
+    return 0;
+  }
+  async exec(b, sp) { for (; b; b = b.next && b.next.block) { if (b.enabled === false) continue; await this.step(b, sp); } }
+  async glide(sp, tx, ty, dur) {
+    tx = Math.max(-225, Math.min(225, tx)); ty = Math.max(-165, Math.min(165, ty));
+    const x0 = sp.x, y0 = sp.y; let line = null;
+    if (sp.pen) { line = { x1: x0, y1: y0, x2: x0, y2: y0, c: sp.penColor }; this.w.lines.push(line); }
+    if (!this.fast && dur > 20) {
+      const t0 = performance.now();
+      for (;;) { const k = Math.min(1, (performance.now() - t0) / dur); sp.x = x0 + (tx - x0) * k; sp.y = y0 + (ty - y0) * k; if (line) { line.x2 = sp.x; line.y2 = sp.y; } if (k >= 1) break; await this.frame(); if (this.stopped) throw new StopErr(); }
+    }
+    sp.x = tx; sp.y = ty; if (line) { line.x2 = tx; line.y2 = ty; }
+    this.log({ k: 'pos', s: sp.name, x: tx, y: ty });
+  }
+  async step(b, sp) {
+    this.check();
+    if (this.onBlock) this.onBlock(sp, b.id);
+    const w = this.w, f = b.fields || {};
+    switch (b.type) {
+      case 'mo_move': { const n = Number(this.val(b, 'N', sp)) || 0, r = sp.dir * Math.PI / 180; await this.glide(sp, sp.x + n * Math.sin(r), sp.y + n * Math.cos(r), Math.min(450, Math.abs(n) * 4)); break; }
+      case 'mo_right': case 'mo_left': { let n = Number(this.val(b, 'N', sp)) || 0; if (b.type === 'mo_left') n = -n; sp.dir = wrapDir(sp.dir + n); sp.turned += n; this.log({ k: 'turn', s: sp.name, d: n }); break; }
+      case 'mo_goto': await this.glide(sp, Number(this.val(b, 'X', sp)) || 0, Number(this.val(b, 'Y', sp)) || 0, 0); break;
+      case 'mo_point': sp.dir = wrapDir(Number(this.val(b, 'N', sp)) || 0); break;
+      case 'lo_sayfor': { const s = String(this.val(b, 'S', sp)); sp.say = s; this.log({ k: 'say', s: sp.name, t: s }); await this.sleep((Number(this.val(b, 'N', sp)) || 0) * 1000); if (sp.say === s) sp.say = ''; this.log({ k: 'sayEnd', s: sp.name }); break; }
+      case 'lo_say': { const s = String(this.val(b, 'S', sp)); sp.say = s; this.log({ k: 'say', s: sp.name, t: s }); break; }
+      case 'lo_show': sp.visible = true; this.log({ k: 'show', s: sp.name }); break;
+      case 'lo_hide': sp.visible = false; this.log({ k: 'hide', s: sp.name }); break;
+      case 'pe_clear': w.lines = []; this.log({ k: 'clear' }); break;
+      case 'pe_down': sp.pen = true; break;
+      case 'pe_up': sp.pen = false; break;
+      case 'ct_wait': await this.sleep((Number(this.val(b, 'N', sp)) || 0) * 1000); break;
+      case 'ct_repeat': { const n = Math.round(Number(this.val(b, 'N', sp)) || 0), body = this.inp(b, 'DO'); for (let i = 0; i < n; i++) { await this.exec(body, sp); await this.frame(); this.check(); } break; }
+      case 'ct_forever': { const body = this.inp(b, 'DO'); for (;;) { await this.exec(body, sp); await this.frame(); this.check(); } }
+      case 'ct_if': if (this.cond(b, 'COND', sp)) await this.exec(this.inp(b, 'DO'), sp); break;
+      case 'ct_ifelse': await this.exec(this.inp(b, this.cond(b, 'COND', sp) ? 'DO' : 'ELSE'), sp); break;
+      case 'ct_stop': this.log({ k: 'stopAll' }); this.stopAll = true; this.stop(); throw new StopErr();
+      case 'va_set': { const v = this.val(b, 'N', sp); w.vars[f.VAR] = isNum(v) ? Number(v) : v; this.log({ k: 'var', n: f.VAR, v: w.vars[f.VAR] }); break; }
+      case 'va_change': { w.vars[f.VAR] = (Number(w.vars[f.VAR]) || 0) + (Number(this.val(b, 'N', sp)) || 0); this.log({ k: 'var', n: f.VAR, v: w.vars[f.VAR] }); break; }
+      case 'li_clear': w.lists[f.LIST] = []; this.log({ k: 'list', n: f.LIST }); break;
+      case 'li_add': (w.lists[f.LIST] = w.lists[f.LIST] || []).push(String(this.val(b, 'S', sp))); this.log({ k: 'list', n: f.LIST }); break;
+      case 'ev_bcast': { const m = f.MSG; this.log({ k: 'bcast', m }); for (const [s2, t] of this.hats('ev_recv', t => t.fields && t.fields.MSG === m)) this.spawn(s2, t); break; }
+    }
+  }
+}
+async function runFast(L, progs, over) {
+  const w = makeWorld(L, over), rt = new Runtime(L, w, { fast: true, progs });
+  await rt.start();
+  return { trace: rt.trace, w, timedOut: rt.timedOut, stopAll: rt.stopAll };
+}
+
+/* ---------------- 檢查用小工具 ---------------- */
+const near = (a, b, c, d) => Math.hypot(a - c, b - d) < 1.5;
+const H = {
+  says: (r, name) => r.trace.filter(e => e.k === 'say' && (!name || e.s === name)).map(e => String(e.t)),
+  idx: (r, pred) => r.trace.findIndex(pred),
+  segs(r) {
+    const out = [];
+    for (const l of r.w.lines) {
+      const dx = l.x2 - l.x1, dy = l.y2 - l.y1; if (Math.hypot(dx, dy) < 0.5) continue;
+      const p = out[out.length - 1];
+      if (p && near(p.x2, p.y2, l.x1, l.y1)) { const px = p.x2 - p.x1, py = p.y2 - p.y1; if (Math.abs(px * dy - py * dx) < 1e-3 * Math.hypot(px, py) * Math.hypot(dx, dy) && px * dx + py * dy > 0) { p.x2 = l.x2; p.y2 = l.y2; continue; } }
+      out.push({ ...l });
+    }
+    return out;
+  },
+  poly(r, n) {
+    const s = H.segs(r);
+    if (s.length !== n) return { ok: false, count: s.length };
+    const len = s.map(l => Math.hypot(l.x2 - l.x1, l.y2 - l.y1));
+    const ok = len.every(v => Math.abs(v - len[0]) < 2) && near(s[n - 1].x2, s[n - 1].y2, s[0].x1, s[0].y1) && s.every((l, i) => i === 0 || near(s[i - 1].x2, s[i - 1].y2, l.x1, l.y1));
+    return { ok, count: s.length };
+  },
+};
+const PASS = { ok: true };
+const FAIL = msg => ({ ok: false, msg });
+
+/* =====================================================================
+   區域與關卡資料
+   ===================================================================== */
+const ZONES = [
+  { n: '入口大門', i: '🏰', topic: '順序、事件', note: ['程式會<b>由上往下</b>，一塊一塊照順序執行。', '帽子形狀的積木（例如「當 🏁 被點擊」）決定程式<b>什麼時候開始</b>。', '角色會停在<b>上一次的位置</b>，所以程式開頭常常要先「定位」回起點。'] },
+  { n: '旋轉木馬', i: '🎠', topic: '重複、角度', note: ['「重複 N 次」會把裡面的積木做 N 次。', '轉一整圈是 <b>360 度</b>。', '畫正多邊形：重複「邊數」次，每次轉「<b>360 ÷ 邊數</b>」度。例如正方形：4 次 × 90 度。'] },
+  { n: '雲霄飛車', i: '🎢', topic: '如果／否則、比較', note: ['「如果…那麼」：條件成立才做。', '「如果…那麼…否則」：成立做上面，不成立做下面（否則）。', '「&gt;」大於、「&lt;」小於、「=」等於。<b>「&gt; 130」不包含 130</b>。', '「如果」只在執行到它的那一刻檢查一次，要一直檢查就要放進迴圈裡。'] },
+  { n: '售票機', i: '🎫', topic: '變數', note: ['變數像一個<b>會記住數字的盒子</b>。', '「設為」：把盒子裡的數字<b>換掉</b>。', '「改變」：在原本的數字上<b>加上去</b>（負數就是減）。', '變數會記住上一次的數字，程式開始時通常要先「設為 0」（初始化）。'] },
+  { n: '廣播站', i: '📢', topic: '廣播', note: ['「廣播 訊息」就像園區廣播，所有角色都聽得到。', '「當我收到 訊息」的角色聽到後就開始動。', '廣播和接收的<b>訊息名稱要一模一樣</b>。', '廣播放在程式的哪裡，就在那個時間點發出。'] },
+  { n: '排隊名單', i: '📋', topic: '清單', note: ['清單像一張名單，可以存<b>很多筆</b>資料。', '「新增 … 到 清單」：加一筆；「刪除 … 的所有項目」：清空。', '「項目數量」：算算看有幾筆。', '清單也會<b>記住上一次的內容</b>！'] },
+  { n: '閉園煙火秀', i: '🎆', topic: '綜合挑戰', note: ['大魔王關：程式裡同時藏了 <b>3 個 Bug</b>。', '有兩個角色，記得點上方的<b>角色分頁</b>，兩邊的程式都要檢查。', '每次送出檢查，系統會告訴你還剩幾個 Bug。'] },
+];
+const MASCOT = { name: '小兔', emoji: '🐰', x: -180, y: -60, size: 62 };
+const HORSE = { name: '木馬', emoji: '🐴', x: -50, y: 50, rotate: true, faceLeft: true, size: 46, penColor: '#e83e8c' };
+const ROBOT = { name: '驗票員', emoji: '🤖', x: -120, y: -50, size: 66 };
+const CAR = { name: '飛車', emoji: '🚃', x: -200, y: -40, size: 54 };
+const BEAR = { name: '售票員', emoji: '🐻', x: -140, y: -50, size: 66 };
+const HOST = { name: '主持人', emoji: '🐼', x: -140, y: -60, size: 66 };
+const FW = { name: '煙火', emoji: '🎆', x: 100, y: 50, size: 96, rotate: true, runFirst: true, visible: false };
+const FOX = { name: '服務員', emoji: '🦊', x: -150, y: -60, size: 64 };
+const HEIGHT_TB = () => [K.iff(), K.ifelse(), K.gt(K.getv('身高'), 130), K.sayfor('請上車！', 1), K.sayfor('長高再來喔', 1), K.getv('身高')];
+async function rideCheck(run, cases) {
+  for (const [who, h, want] of cases) {
+    const r = await run({ vars: { 身高: h } }), s = H.says(r).join('、');
+    const other = want === '請上車' ? '長高' : '請上車';
+    if (!s.includes(want) || s.includes(other)) return FAIL(`${who}（${h} 公分）應該聽到「${want === '長高' ? '長高再來喔' : '請上車！'}」，但驗票員說的是：${s || '（什麼都沒說）'}`);
+  }
+  return PASS;
+}
+
+const LEVELS = [
+/* ---------- 第 1 區：入口大門 ---------- */
+{ id: '1-1', z: 0, title: '小兔迎賓', mode: 'A', bg: 'gate',
+  story: '開園時，吉祥物小兔要從左邊走到大門口，再跟遊客說「歡迎光臨！」。可是小兔卻在原地先說完話，才慢慢走過去。',
+  goal: '小兔<b>先走到大門口</b>，<b>再</b>說「歡迎光臨！」',
+  sprites: [{ ...MASCOT, code: () => [at(24, 24, K.flag(K.goto(-180, -60), id(K.sayfor('歡迎光臨！', 1), 'BUG'), id(K.rep(10, K.move(28)), 'BUG2')))], fix: () => [at(24, 24, K.flag(K.goto(-180, -60), K.rep(10, K.move(28)), K.sayfor('歡迎光臨！', 1)))] }],
+  answer: ['BUG', 'BUG2'], hl: [[0, 'BUG']],
+  hints: ['想一想：程式是<b>由上往下</b>一塊一塊執行的。', '注意閃爍的積木，它出現的時機對嗎？', '「說出 歡迎光臨！」應該放在走路（重複 10 次）的<b>後面</b>。點那塊「說出」積木！'],
+  explain: '程式會由上往下依序執行。「說」放在「走」前面，小兔就會先說話再走路。<b>積木的順序不同，結果就不同！</b>' },
+{ id: '1-2', z: 0, title: '按了沒反應', mode: 'A', bg: 'gate',
+  story: '按下綠旗，小兔應該說「歡迎光臨！」並轉一圈跟大家打招呼。但按了綠旗，小兔卻一點反應也沒有……',
+  goal: '按下 🏁 後，小兔說「歡迎光臨！」並轉一圈',
+  sprites: [{ ...MASCOT, x: -40, rotate: true, code: () => [at(24, 24, id(K.click(K.sayfor('歡迎光臨！', 1), K.rep(12, K.right(30))), 'BUG'))], fix: () => [at(24, 24, K.flag(K.sayfor('歡迎光臨！', 1), K.rep(12, K.right(30))))] }],
+  answer: ['BUG'], hl: [[0, 'BUG']],
+  hints: ['程式要開始執行，需要一個「開始的訊號」。', '看看最上面那塊<b>帽子形狀</b>的積木。', '開頭用的是「當角色被點擊」，要點小兔才會執行。按綠旗要用「當 🏁 被點擊」。點最上面那塊！'],
+  explain: '帽子積木決定「<b>什麼時候開始</b>」。「當角色被點擊」要點角色才會執行；想按綠旗開始，就要用「當 🏁 被點擊」。（你可以試試直接點舞台上的小兔！）' },
+{ id: '1-3', z: 0, title: '跑出畫面了', mode: 'A2', bg: 'gate',
+  story: '第一次按綠旗，小兔順利走到門口。可是再按一次，小兔就從門口繼續往右走，跑到畫面外面了！（小兔現在停在上一次走到的位置。）',
+  goal: '<b>每次</b>按 🏁，小兔都從左邊（x: -180）出發，走到大門口',
+  sprites: [{ ...MASCOT, x: 100, code: () => [at(24, 24, id(K.flag(K.rep(10, K.move(28)), K.sayfor('歡迎光臨！', 1)), 'H'))], fix: () => [at(24, 24, K.flag(K.goto(-180, -60), K.rep(10, K.move(28)), K.sayfor('歡迎光臨！', 1)))] }],
+  quiz: { q: '這個程式少了哪一塊積木？', chip: true, opts: [['右轉 ↻ 90 度', 'motion'], ['定位到 x: -180 y: -60', 'motion'], ['等待 1 秒', 'control'], ['說出 你好！', 'looks']], ans: 1 },
+  hl: [[0, 'H']],
+  hints: ['每次執行時，小兔是從「<b>上一次停下來的地方</b>」開始的。', '要讓小兔每次都回到起點，需要一塊「設定位置」的積木。', '答案是「定位到 x: -180 y: -60」，放在「當 🏁 被點擊」的正下方。'],
+  explain: '角色會停在上一次的位置。在程式開頭加上「<b>定位到 x: -180 y: -60</b>」，小兔每次都會先回到起點，這叫做「初始化」。' },
+
+/* ---------- 第 2 區：旋轉木馬 ---------- */
+{ id: '2-1', z: 1, title: '木馬畫軌道', mode: 'C', bg: 'carousel',
+  story: '旋轉木馬要在地上畫出新的軌道。先讀讀程式，猜猜看木馬會畫出什麼形狀？',
+  goal: '讀程式，預測畫出的形狀',
+  sprites: [{ ...HORSE, code: () => [at(24, 24, K.flag(K.clear(), K.goto(-50, 50), K.point(90), K.pdown(), id(K.rep(4, K.move(100), K.right(90)), 'H'), K.pup()))] }],
+  quiz: { q: '木馬會畫出什麼形狀？', opts: ['➖ 一條直線', '🔺 三角形', '⬜ 正方形', '▭ 長方形'], ans: 2 },
+  hl: [[0, 'H']],
+  hints: ['數一數：「移動 100 點」總共會執行幾次？', '每次都轉 90 度，也就是一個<b>直角</b>。', '4 條一樣長的邊＋4 個直角＝<b>正方形</b>。'],
+  explain: '重複 4 次「走 100 點、右轉 90 度」，走了 4 條一樣長的邊、轉了 4 個直角，就是正方形。' },
+{ id: '2-2', z: 1, title: '少一邊的正方形', mode: 'B', bg: 'carousel',
+  story: '木馬應該畫出一個正方形軌道，可是畫出來<b>少了一邊</b>，軌道沒有接起來！',
+  goal: '木馬畫出一個<b>完整的正方形</b>（4 條邊，回到起點）',
+  sprites: [{ ...HORSE, code: () => [at(24, 24, K.flag(K.clear(), K.goto(-50, 50), K.point(90), K.pdown(), id(K.rep(3, K.move(100), K.right(90)), 'BUG'), K.pup()))], fix: () => [at(24, 24, K.flag(K.clear(), K.goto(-50, 50), K.point(90), K.pdown(), K.rep(4, K.move(100), K.right(90)), K.pup()))] }],
+  toolbox: () => [K.move(100), K.right(90), K.left(90), K.rep(4), K.pdown(), K.pup(), K.clear(), K.goto(-50, 50), K.point(90)],
+  hl: [[0, 'BUG']],
+  check: async run => { const r = await run(), p = H.poly(r, 4); return p.ok ? PASS : FAIL(`畫出來的不是完整的正方形喔！現在畫了 ${p.count} 條邊。`); },
+  hints: ['正方形有幾條邊？', '閃爍的「重複」積木，次數對嗎？', '把「重複 3 次」改成「重複 <b>4</b> 次」。'],
+  explain: '正方形有 4 條邊，所以要「重複 4 次」。重複的次數＝要畫的邊數。' },
+{ id: '2-3', z: 1, title: '三角形軌道', mode: 'C', bg: 'carousel',
+  story: '工程師又寫了一段畫軌道的程式。這次每走一段就左轉 120 度，會畫出什麼？',
+  goal: '讀程式，預測畫出的形狀',
+  sprites: [{ ...HORSE, x: -60, y: -50, code: () => [at(24, 24, K.flag(K.clear(), K.goto(-60, -50), K.point(90), K.pdown(), id(K.rep(3, K.move(120), K.left(120)), 'H'), K.pup()))] }],
+  quiz: { q: '木馬會畫出什麼形狀？', opts: ['⬜ 正方形', '🔺 正三角形', '📐 缺一邊的三角形', '⬡ 六邊形'], ans: 1 },
+  hl: [[0, 'H']],
+  hints: ['重複幾次，就會畫出幾條邊。', '3 次 × 120 度 = ？ 剛好轉一整圈嗎？', '3 條邊、總共轉 360 度回到起點，是<b>正三角形</b>。'],
+  explain: '轉一整圈是 360 度。3 次 × 120 度 = 360 度，剛好回到起點，畫出正三角形。' },
+{ id: '2-4', z: 1, title: '六邊形亂掉了', mode: 'B', bg: 'carousel',
+  story: '豪華旋轉木馬的軌道是<b>正六邊形</b>，但程式畫出來的卻是一個重複畫線的正方形！',
+  goal: '畫出一個<b>正六邊形</b>（6 條一樣長的邊，回到起點）',
+  sprites: [{ ...HORSE, x: -35, y: -90, code: () => [at(24, 24, K.flag(K.clear(), K.goto(-35, -90), K.point(90), K.pdown(), K.rep(6, K.move(70), id(K.left(90), 'BUG')), K.pup()))], fix: () => [at(24, 24, K.flag(K.clear(), K.goto(-35, -90), K.point(90), K.pdown(), K.rep(6, K.move(70), K.left(60)), K.pup()))] }],
+  toolbox: () => [K.move(70), K.left(60), K.right(60), K.rep(6), K.pdown(), K.pup(), K.clear(), K.goto(-35, -90), K.point(90)],
+  hl: [[0, 'BUG']],
+  check: async run => { const r = await run(), p = H.poly(r, 6); return p.ok ? PASS : FAIL('還不是正六邊形喔！想想看：每次要轉幾度，6 次才剛好轉滿一圈？'); },
+  hints: ['走完一圈，總共要轉 <b>360 度</b>。', '六邊形要轉 6 次，每次轉幾度？（360 ÷ 6）', '把「左轉 90 度」改成「左轉 <b>60</b> 度」。'],
+  explain: '畫正多邊形時，每次轉的角度＝<b>360 ÷ 邊數</b>。六邊形：360 ÷ 6 = 60 度。' },
+
+/* ---------- 第 3 區：雲霄飛車 ---------- */
+{ id: '3-1', z: 2, title: '身高檢查站', mode: 'A', bg: 'coaster', vars: { 身高: 140 },
+  tests: { v: '身高', opts: [['小華', 140], ['小明', 120]] },
+  story: '雲霄飛車規定：身高<b>超過 130 公分</b>才能搭。可是 140 公分的小華被擋下來，120 公分的小明反而可以上車！',
+  goal: '身高超過 130 公分說「請上車！」，否則說「長高再來喔」',
+  sprites: [{ ...ROBOT, code: () => [at(24, 24, K.flag(K.ifelse(id(K.lt(K.getv('身高'), 130), 'BUG'), [K.sayfor('請上車！', 1)], [K.sayfor('長高再來喔', 1)])))], fix: () => [at(24, 24, K.flag(K.ifelse(K.gt(K.getv('身高'), 130), [K.sayfor('請上車！', 1)], [K.sayfor('長高再來喔', 1)])))] }],
+  answer: ['BUG'], hl: [[0, 'BUG']],
+  hints: ['先在舞台下方選不同的遊客，按綠旗試試看，結果對嗎？', '問題出在「如果」後面的<b>判斷條件</b>。', '「身高 &lt; 130」是「比 130 矮」，應該是「身高 &gt; 130」。點那塊綠色的比較積木！'],
+  explain: '「&lt;」是小於、「&gt;」是大於。符號寫反，判斷的結果就完全相反了。' },
+{ id: '3-2', z: 2, title: '沒說話的驗票員', mode: 'B', bg: 'coaster', vars: { 身高: 120 },
+  tests: { v: '身高', opts: [['小明', 120], ['小華', 140]] },
+  story: '驗票員對夠高的遊客會說「請上車！」，但遇到不夠高的小明，卻一句話也不說，小明一直站在那裡等。',
+  goal: '超過 130 公分說「請上車！」；<b>不到</b>就說「長高再來喔」',
+  sprites: [{ ...ROBOT, code: () => [at(24, 24, K.flag(id(K.iff(K.gt(K.getv('身高'), 130), K.sayfor('請上車！', 1)), 'BUG')))], fix: () => [at(24, 24, K.flag(K.ifelse(K.gt(K.getv('身高'), 130), [K.sayfor('請上車！', 1)], [K.sayfor('長高再來喔', 1)])))] }],
+  toolbox: HEIGHT_TB, hl: [[0, 'BUG']],
+  check: run => rideCheck(run, [['小明', 120, '長高'], ['小華', 140, '請上車']]),
+  hints: ['身高不夠的時候，程式有做任何事嗎？', '「如果…那麼」只處理一種情況；兩種情況要用「如果…那麼…<b>否則</b>」。', '拿一塊「如果…那麼…否則」，把條件和「請上車！」搬進去，再在「否則」裡放「說出 長高再來喔」。'],
+  explain: '「如果…那麼」只有條件成立時才做事；要處理「成立」和「不成立」兩種情況，就用「<b>如果…那麼…否則</b>」。' },
+{ id: '3-3', z: 2, title: '停不下來的飛車', mode: 'B', bg: 'coaster', maxMs: 6000,
+  story: '雲霄飛車開到終點（x 超過 200）就要停下來，可是飛車一路衝到畫面邊邊，還一直往前推，根本停不下來！',
+  goal: '飛車開到終點（<b>x 座標 &gt; 200</b>）就停下來',
+  sprites: [{ ...CAR, code: () => [at(24, 24, K.flag(K.goto(-200, -40), id(K.iff(K.gt(K.xpos(), 200), K.stop()), 'BUG'), K.forever(K.move(5))))], fix: () => [at(24, 24, K.flag(K.goto(-200, -40), K.forever(K.move(5), K.iff(K.gt(K.xpos(), 200), K.stop()))))] }],
+  toolbox: () => [K.forever(), K.iff(), K.gt(K.xpos(), 200), K.xpos(), K.stop(), K.move(5), K.goto(-200, -40)],
+  hl: [[0, 'BUG']],
+  check: async run => { const r = await run(), x = r.w.sprites[0].x; return (r.stopAll && x > 200 && x < 216) ? PASS : FAIL(r.stopAll ? `飛車停在 x = ${Math.round(x)}，位置不對喔！` : '飛車開到終點還是沒有停下來喔！'); },
+  hints: ['「如果」只會在執行到它的那一瞬間<b>檢查一次</b>。', '飛車一直在「不停重複」裡跑，判斷卻放在迴圈<b>外面</b>。', '把「如果 x 座標 &gt; 200 那麼 停止全部」拖進「不停重複」裡面，放在「移動 5 點」下面。'],
+  explain: '放在迴圈外的「如果」只會檢查一次，那時飛車還在起點。<b>放進迴圈裡</b>，每走一步就檢查一次，才能及時停車。' },
+{ id: '3-4', z: 2, title: '剛好 130 公分', mode: 'B', bg: 'coaster', vars: { 身高: 130 },
+  tests: { v: '身高', opts: [['小芸', 129], ['小美', 130], ['小傑', 145]] },
+  story: '新規定：身高「<b>130 公分（含）以上</b>」就能搭。剛好 130 公分的小美很開心地來排隊，卻被說「長高再來喔」！',
+  goal: '130 公分（含）以上說「請上車！」，129 公分以下說「長高再來喔」',
+  sprites: [{ ...ROBOT, code: () => [at(24, 24, K.flag(K.ifelse(id(K.gt(K.getv('身高'), 130), 'BUG'), [K.sayfor('請上車！', 1)], [K.sayfor('長高再來喔', 1)])))], fix: () => [at(24, 24, K.flag(K.ifelse(K.gt(K.getv('身高'), 129), [K.sayfor('請上車！', 1)], [K.sayfor('長高再來喔', 1)])))] }],
+  toolbox: () => [K.gt(K.getv('身高'), 130), K.lt(K.getv('身高'), 130), K.eq(K.getv('身高'), 130), K.or(), K.getv('身高')],
+  hl: [[0, 'BUG']],
+  check: run => rideCheck(run, [['小芸', 129, '長高'], ['小美', 130, '請上車'], ['小傑', 145, '請上車']]),
+  hints: ['在舞台下方選「小美 130」試試看，她能搭嗎？', '「&gt; 130」<b>不包含</b> 130 本身。', '改成「身高 &gt; 129」，或用「或」組合：「身高 &gt; 130」或「身高 = 130」。'],
+  explain: '「大於 130」不包含 130。規定是「130 以上（含）」，所以可以寫成「&gt; 129」，或「&gt; 130 <b>或</b> = 130」。' },
+
+/* ---------- 第 4 區：售票機 ---------- */
+{ id: '4-1', z: 3, title: '賣出三張票', mode: 'C', bg: 'ticket', vars: { 收入: 0 },
+  story: '售票機開始營業！讀讀程式，猜猜看賣完票後「收入」是多少？',
+  goal: '讀程式，預測變數「收入」的值',
+  sprites: [{ ...BEAR, code: () => [at(24, 24, K.flag(K.setv('收入', 0), id(K.rep(3, K.chg('收入', 100), K.sayfor('賣出一張票！', 0.5)), 'H')))] }],
+  quiz: { q: '執行完後，「收入」是多少？', opts: ['100', '3', '300', '0'], ans: 2 },
+  hl: [[0, 'H']],
+  hints: ['一開始先把「收入」設為 0。', '「改變 100」是在原本的數字上<b>加 100</b>。', '0 + 100 + 100 + 100 = <b>300</b>。'],
+  explain: '「改變 100」會在原本的數字上加 100。重複 3 次：0 → 100 → 200 → 300。' },
+{ id: '4-2', z: 3, title: '收入不會變多', mode: 'B', bg: 'ticket', vars: { 收入: 0 },
+  story: '每賣出一張票，收入要多 100 元。賣了 5 張票，收入應該是 500 元，可是售票機一直顯示 100 元！',
+  goal: '賣出 5 張票後，收入是 <b>500</b>（100 → 200 → 300 → 400 → 500）',
+  sprites: [{ ...BEAR, code: () => [at(24, 24, K.flag(K.setv('收入', 0), K.rep(5, id(K.setv('收入', 100), 'BUG'), K.sayfor('賣出一張票！', 0.4))))], fix: () => [at(24, 24, K.flag(K.setv('收入', 0), K.rep(5, K.chg('收入', 100), K.sayfor('賣出一張票！', 0.4))))] }],
+  toolbox: () => [K.setv('收入', 0), K.chg('收入', 100), K.getv('收入'), K.rep(5), K.sayfor('賣出一張票！', 0.4)],
+  hl: [[0, 'BUG']],
+  check: async run => { const r = await run(), v = r.w.vars['收入'], hist = r.trace.filter(e => e.k === 'var' && e.n === '收入').map(e => e.v); return (v === 500 && [200, 300, 400].every(x => hist.includes(x))) ? PASS : FAIL(`賣了 5 張票，收入卻是 ${v} 元，應該要一張一張加上去，最後是 500 元。`); },
+  hints: ['看看舞台左上角，「收入」最後變成多少？', '「設為」會把數字<b>直接換掉</b>，「改變」才會<b>累加</b>。', '把重複裡的「變數 收入 設為 100」換成「變數 收入 <b>改變</b> 100」。'],
+  explain: '「設為 100」每次都把收入換成 100；「改變 100」才是在原本的數字上再加 100。' },
+{ id: '4-3', z: 3, title: '昨天的錢還在', mode: 'B', bg: 'ticket', vars: { 收入: 1200 },
+  story: '今天賣了 3 張票，收入應該是 300 元。可是售票機顯示 1500 元，原來是<b>昨天的 1200 元</b>還留在變數裡！',
+  goal: '不管原本剩多少，今天賣 3 張票後，收入都顯示 <b>300</b>',
+  sprites: [{ ...BEAR, code: () => [at(24, 24, id(K.flag(K.rep(3, K.chg('收入', 100), K.sayfor('賣出一張票！', 0.4))), 'H'))], fix: () => [at(24, 24, K.flag(K.setv('收入', 0), K.rep(3, K.chg('收入', 100), K.sayfor('賣出一張票！', 0.4))))] }],
+  toolbox: () => [K.setv('收入', 0), K.chg('收入', 100), K.getv('收入'), K.rep(3), K.sayfor('賣出一張票！', 0.4)],
+  hl: [[0, 'H']],
+  check: async run => { const a = await run({ vars: { 收入: 1200 } }), b = await run({ vars: { 收入: 0 } }); if (a.w.vars['收入'] !== 300) return FAIL(`昨天剩下 1200 元時，今天的收入顯示 ${a.w.vars['收入']} 元，應該是 300 元。`); if (b.w.vars['收入'] !== 300) return FAIL(`收入從 0 開始時，結果是 ${b.w.vars['收入']} 元，應該是 300 元。`); return PASS; },
+  hints: ['按綠旗之前，「收入」原本是多少？', '每次開始之前，要先把變數「<b>歸零</b>」。', '在「當 🏁 被點擊」下面加上「變數 收入 設為 0」。'],
+  explain: '變數會記住上一次的數字。程式開始時先「<b>設為 0</b>」（初始化），每次的結果才會正確。' },
+
+/* ---------- 第 5 區：廣播站 ---------- */
+{ id: '5-1', z: 4, title: '煙火沒聽到', mode: 'B', bg: 'radio', messages: ['開幕', '開幕式', '煙火'],
+  story: '主持人宣布「遊樂園開幕囉！」並廣播「開幕」，煙火應該跟著放出來，結果煙火完全沒有出現。',
+  goal: '主持人廣播後，<b>煙火出現並旋轉</b>',
+  sprites: [
+    { ...HOST, code: () => [at(24, 24, K.flag(K.sayfor('遊樂園開幕囉！', 1), K.bcast('開幕')))] },
+    { ...FW, code: () => [at(24, 24, K.flag(K.hide())), at(24, 150, id(K.recv('開幕式', K.show(), K.rep(12, K.right(30), K.wait(0.05))), 'BUG'))], fix: () => [at(24, 24, K.flag(K.hide())), at(24, 150, K.recv('開幕', K.show(), K.rep(12, K.right(30), K.wait(0.05))))] }],
+  toolbox: () => [K.bcast('開幕'), K.recv('開幕'), K.show(), K.hide(), K.rep(12), K.right(30)],
+  hl: [[1, 'BUG']],
+  check: async run => { const r = await run(); return H.idx(r, e => e.k === 'show' && e.s === '煙火') >= 0 ? PASS : FAIL('主持人廣播了，煙火卻沒有出現！檢查看看兩邊的訊息名稱。'); },
+  hints: ['廣播和接收的「<b>訊息名稱</b>」要一模一樣。', '點上方的「煙火」分頁，看看它收到的是哪個訊息？', '把煙火的「當我收到 開幕式」改成「當我收到 <b>開幕</b>」（點下拉選單選）。'],
+  explain: '廣播就像園區廣播喊名字：喊「開幕」，只有在等「開幕」的角色會動，<b>名稱差一個字也不行</b>。' },
+{ id: '5-2', z: 4, title: '忘了廣播', mode: 'B', bg: 'radio', messages: ['煙火', '開幕'],
+  story: '主持人倒數「3、2、1，開幕！」之後，煙火應該要放出來，可是舞台上什麼都沒發生。',
+  goal: '主持人倒數完，<b>煙火出現並旋轉</b>',
+  sprites: [
+    { ...HOST, code: () => [at(24, 24, K.flag(id(K.sayfor('3、2、1，開幕！', 1), 'H')))], fix: () => [at(24, 24, K.flag(K.sayfor('3、2、1，開幕！', 1), K.bcast('煙火')))] },
+    { ...FW, code: () => [at(24, 24, K.flag(K.hide())), at(24, 150, K.recv('煙火', K.show(), K.rep(12, K.right(30), K.wait(0.05))))] }],
+  toolbox: () => [K.bcast('煙火'), K.recv('煙火'), K.sayfor('3、2、1，開幕！', 1), K.show(), K.hide(), K.wait(1)],
+  hl: [[0, 'H']],
+  check: async run => { const r = await run(), e = H.idx(r, x => x.k === 'sayEnd' && x.s === '主持人'), s = H.idx(r, x => x.k === 'show' && x.s === '煙火'); if (s < 0) return FAIL('煙火還是沒有出現！煙火在等「煙火」這個訊息，有人送出來嗎？'); if (e < 0 || s < e) return FAIL('煙火要在主持人倒數「之後」才出現喔！'); return PASS; },
+  hints: ['點「煙火」分頁看看：煙火在等哪個訊息？', '主持人有把訊息「<b>廣播</b>」出去嗎？', '在主持人的「說出 3、2、1，開幕！」下面加上「廣播 煙火」。'],
+  explain: '「當我收到」的角色要等到有人「<b>廣播</b>」才會動。沒有廣播，煙火就會一直等下去。' },
+{ id: '5-3', z: 4, title: '煙火放太早', mode: 'B', bg: 'radio', messages: ['煙火', '開幕'],
+  story: '主持人還沒倒數完，煙火就先放出來了，大家都嚇了一跳！',
+  goal: '主持人<b>說完</b>「3、2、1，開幕！」<b>之後</b>，煙火才出現',
+  sprites: [
+    { ...HOST, code: () => [at(24, 24, K.flag(id(K.bcast('煙火'), 'BUG'), K.sayfor('3、2、1，開幕！', 2)))], fix: () => [at(24, 24, K.flag(K.sayfor('3、2、1，開幕！', 2), K.bcast('煙火')))] },
+    { ...FW, code: () => [at(24, 24, K.flag(K.hide())), at(24, 150, K.recv('煙火', K.show(), K.rep(12, K.right(30), K.wait(0.05))))] }],
+  toolbox: () => [K.bcast('煙火'), K.sayfor('3、2、1，開幕！', 2), K.wait(1)],
+  hl: [[0, 'BUG']],
+  check: async run => { const r = await run(), e = H.idx(r, x => x.k === 'sayEnd' && x.s === '主持人'), s = H.idx(r, x => x.k === 'show' && x.s === '煙火'); if (s < 0) return FAIL('煙火沒有出現了！記得要廣播「煙火」。'); if (e < 0 || s < e) return FAIL('煙火還是太早出現了，主持人還沒倒數完！'); return PASS; },
+  hints: ['煙火應該在倒數「之前」還是「之後」出現？', '看主持人的程式順序：先廣播，再說話。', '把「廣播 煙火」拖到「說出 3、2、1，開幕！ 持續 2 秒」的<b>下面</b>。'],
+  explain: '廣播放在哪裡，就在那個時間點發出。先說完話再廣播，煙火才會在倒數之後出現。' },
+
+/* ---------- 第 6 區：排隊名單 ---------- */
+{ id: '6-1', z: 5, title: '排隊有幾人', mode: 'C', bg: 'queue', lists: { 排隊名單: ['阿光', '小玉'] },
+  story: '摩天輪的排隊名單上原本有阿光和小玉。服務員執行了下面的程式，名單會變成怎樣呢？',
+  goal: '讀程式，預測清單裡有幾個人',
+  sprites: [{ ...FOX, code: () => [at(24, 24, K.flag(id(K.lclear('排隊名單'), 'H'), K.ladd('小明', '排隊名單'), K.ladd('小華', '排隊名單'), K.ladd('小美', '排隊名單'), K.sayfor(K.llen('排隊名單'), 2)))] }],
+  quiz: { q: '執行完後，「排隊名單」裡有幾個人？', opts: ['5 人', '3 人', '2 人', '0 人'], ans: 1 },
+  hl: [[0, 'H']],
+  hints: ['「刪除 排隊名單 的所有項目」會把名單<b>清空</b>。', '清空之後，又新增了幾個人？', '清空後再加 3 個人，所以是 <b>3 人</b>。'],
+  explain: '先「刪除所有項目」把名單清空（阿光、小玉被刪掉），再新增 3 個人，所以清單裡有 3 人。' },
+{ id: '6-2', z: 5, title: '名單越排越長', mode: 'CB', bg: 'queue', lists: { 排隊名單: ['小明', '小華', '小美'] },
+  story: '上一場的排隊名單（小明、小華、小美）還留著。服務員又按了一次綠旗……',
+  goal: '每次按 🏁，名單都<b>只有</b>小明、小華、小美 3 個人',
+  sprites: [{ ...FOX, code: () => [at(24, 24, id(K.flag(K.ladd('小明', '排隊名單'), K.ladd('小華', '排隊名單'), K.ladd('小美', '排隊名單'), K.sayfor(K.llen('排隊名單'), 2)), 'H'))], fix: () => [at(24, 24, K.flag(K.lclear('排隊名單'), K.ladd('小明', '排隊名單'), K.ladd('小華', '排隊名單'), K.ladd('小美', '排隊名單'), K.sayfor(K.llen('排隊名單'), 2)))] }],
+  quiz: { q: '按下綠旗後，名單裡會有幾個人？', opts: ['3 人', '6 人', '0 人', '9 人'], ans: 1 },
+  phase2: '猜對了！名單變成 6 個人，有人重複排了兩次。<br>現在<b>動手修</b>：讓每次按綠旗後，名單都只有 3 個人。',
+  toolbox: () => [K.lclear('排隊名單'), K.ladd('小明', '排隊名單'), K.llen('排隊名單'), K.sayfor('排好了！', 1)],
+  hl: [[0, 'H']],
+  check: async run => { const want = JSON.stringify(['小明', '小華', '小美']); const a = await run(), b = await run({ lists: { 排隊名單: [] } }); if (JSON.stringify(a.w.lists['排隊名單']) !== want) return FAIL(`名單變成：${a.w.lists['排隊名單'].join('、') || '（空的）'}，應該只有小明、小華、小美。`); if (JSON.stringify(b.w.lists['排隊名單']) !== want) return FAIL('名單原本是空的時候，結果不對喔！'); return PASS; },
+  hints: ['清單會<b>保留上一次</b>的資料。', '新增人之前，要先把名單清空。', '在「當 🏁 被點擊」下面加上「刪除 排隊名單 的所有項目」。'],
+  explain: '清單和變數一樣會記住上一次的內容。開始時先「<b>刪除所有項目</b>」，名單才不會越排越長。' },
+
+/* ---------- 第 7 區：閉園煙火秀 ---------- */
+{ id: '7-1', z: 6, title: '閉園煙火秀', mode: 'B', bg: 'finale', boss: true, vars: { 收入: 800 }, messages: ['煙火', '煙火秀'],
+  story: 'Bug 小精靈的最後一招！閉園煙火秀的程式裡藏了 <b>3 個 Bug</b>：收入算錯、煙火沒出現、煙火轉不滿一圈。修好它，遊樂園就能準時開幕！',
+  goal: '① 今天賣 3 張票，收入顯示 <b>300</b>（原本留著 800）<br>② 主持人說完話，<b>煙火出現</b><br>③ 煙火<b>轉滿一整圈</b>（360 度）',
+  sprites: [
+    { ...HOST, code: () => [at(24, 24, id(K.flag(K.rep(3, K.chg('收入', 100), K.sayfor('賣出一張票！', 0.4)), K.sayfor('今天辛苦了，放煙火囉！', 1.5), id(K.bcast('煙火秀'), 'BUG2')), 'BUG1'))], fix: () => [at(24, 24, K.flag(K.setv('收入', 0), K.rep(3, K.chg('收入', 100), K.sayfor('賣出一張票！', 0.4)), K.sayfor('今天辛苦了，放煙火囉！', 1.5), K.bcast('煙火')))] },
+    { ...FW, code: () => [at(24, 24, K.flag(K.hide())), at(24, 150, K.recv('煙火', K.show(), id(K.rep(4, K.right(30), K.wait(0.05)), 'BUG3')))], fix: () => [at(24, 24, K.flag(K.hide())), at(24, 150, K.recv('煙火', K.show(), K.rep(12, K.right(30), K.wait(0.05))))] }],
+  toolbox: () => [K.setv('收入', 0), K.chg('收入', 100), K.getv('收入'), K.bcast('煙火'), K.recv('煙火'), K.rep(12), K.right(30), K.wait(0.05), K.show(), K.hide()],
+  hl: [[0, 'BUG1'], [0, 'BUG2'], [1, 'BUG3']],
+  check: async run => {
+    const a = await run({ vars: { 收入: 800 } }), b = await run({ vars: { 收入: 0 } }), msgs = [];
+    if (!(a.w.vars['收入'] === 300 && b.w.vars['收入'] === 300)) msgs.push('💰 收入還是算錯了');
+    const shown = H.idx(a, e => e.k === 'show' && e.s === '煙火') >= 0;
+    if (!shown) msgs.push('🎆 煙火沒有出現');
+    const t = Math.abs(a.w.sprites[1].turned);
+    if (!shown || !(t >= 360 && t % 360 === 0)) { if (shown) msgs.push('🔄 煙火沒有剛好轉滿一整圈'); else msgs.push('🔄 （煙火沒出現，還看不出有沒有轉滿一圈）'); }
+    return msgs.length ? { ok: false, remain: msgs.length, msg: `還剩 <b>${msgs.length}</b> 個 Bug：<br>` + msgs.join('<br>') } : PASS;
+  },
+  hints: ['3 個 Bug 分別和「變數」、「廣播」、「重複」有關。主持人和煙火兩個分頁都要看！', '閃爍的積木都和 Bug 有關（切換分頁也會閃）。', '① 主持人開頭加「變數 收入 設為 0」<br>② 把「廣播 煙火秀」改成「廣播 煙火」<br>③ 煙火改成「重複 12 次」（12 × 30 = 360 度）'],
+  explain: '恭喜打敗 Bug 小精靈！你用到了<b>初始化變數</b>、<b>廣播名稱要一致</b>、<b>重複次數 × 角度 = 360</b> 這三個除錯技巧。' },
+];
+LEVELS.forEach((L, i) => { L.i = i; L.varNames = Object.keys(L.vars || {}); L.listNames = Object.keys(L.lists || {}); if (!L.messages) L.messages = ['訊息1']; });
+const MODE_NAME = { A: '🔍 抓 Bug', A2: '🔍 抓 Bug', C: '🤔 先猜再跑', B: '🔧 動手修', CB: '🤔 先猜再修' };
+const MODE_HOW = {
+  A: '先按舞台上的 🏁 看看現在的效果，再<b>點一下程式裡出錯的那塊積木</b>。',
+  A2: '先按 🏁 看看現在的效果，再從下面選出<b>缺少的積木</b>。',
+  C: '先讀程式、<b>猜猜結果</b>，選好答案後會自動執行驗證。',
+  B: '拖曳、修改積木，按 🏁 試跑；修好後按「<b>✅ 送出檢查</b>」。',
+};
+
+/* =====================================================================
+   玩家進度與分數
+   ===================================================================== */
+let P = null;
+function lvSt(L) { return P.lv[L.id] || (P.lv[L.id] = { t: 0, h: 0, w: 0 }); }
+function saveP() { if (P) store('park1_' + P.pid, P); }
+function calcScore(st) {
+  const t = st.t || 0, tb = t <= 60 ? 50 : t >= 300 ? 0 : Math.round(50 * (300 - t) / 240);
+  const hc = [0, 10, 30, 60][st.h || 0], wc = 5 * (st.w || 0);
+  return { tb, hc, wc, total: Math.max(20, 100 + tb - hc - wc) };
+}
+function summary() {
+  let score = 0, cleared = 0, time = 0, hints = 0;
+  for (const L of LEVELS) { const s = P.lv[L.id]; if (!s) continue; hints += s.h || 0; if (s.done) { score += s.score; cleared++; time += Math.round(s.t); } }
+  return { score, cleared, time, hints };
+}
+const finished = L => { const s = P.lv[L.id]; return !!(s && (s.done || s.skip)); };
+const unlocked = L => L.i === 0 || finished(LEVELS[L.i - 1]);
+
+/* ---------------- 排行榜 ---------------- */
+function upload() {
+  if (!SCRIPT_URL || !P) return;
+  const s = summary();
+  const q = new URLSearchParams({ action: 'submit', pid: P.pid, cls: P.cls, seat: P.seat, nick: P.nick, score: s.score, cleared: s.cleared, time: s.time, hints: s.hints });
+  fetch(SCRIPT_URL + '?' + q).then(r => r.json()).then(d => { if (d && d.ok && d.rank) setTimeout(() => toast(`🏆 成績已上傳！目前全校第 ${d.rank} 名`), 1200); }).catch(() => {});
+}
+function fetchTop(cls) {
+  const q = new URLSearchParams({ action: 'top', cls: cls || '', pid: P ? P.pid : '' });
+  return fetch(SCRIPT_URL + '?' + q).then(r => r.json());
+}
+function boardTable(d) {
+  if (!d || !d.ok) return '<p>排行榜讀取失敗，請稍後再試。</p>';
+  if (!d.list.length) return '<p>還沒有人上榜，快來當第一名！</p>';
+  const medal = r => r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : r;
+  return `<table class="board"><tr><th>名次</th><th>班級</th><th>座號</th><th>名字</th><th>分數</th><th>通關</th><th>用時</th></tr>` +
+    d.list.map(r => `<tr class="${r.me ? 'me' : ''}"><td>${medal(r.rank)}</td><td>${esc(r.cls)}</td><td>${esc(r.seat)}</td><td>${esc(r.nick)}</td><td><b>${r.score}</b></td><td>${r.cleared}/20</td><td>${fmtT(r.time)}</td></tr>`).join('') + '</table>';
+}
+let boardTimer = null;
+function showBoard(scope) {
+  scope = scope || 'all';
+  clearInterval(boardTimer);
+  openModal(`<h2>🏆 排行榜</h2><div style="display:flex;gap:8px"><button class="btn small ${scope === 'all' ? '' : 'ghost'}" id="bA">全校</button><button class="btn small ${scope === 'cls' ? '' : 'ghost'}" id="bC">${esc(P.cls)} 班</button><div class="sp"></div><span style="font-size:13px;color:var(--sub);align-self:center">每 15 秒自動更新</span></div><div id="bL" style="margin-top:12px">讀取中…</div><div class="row"><button class="btn" id="bX">關閉</button></div>`, () => clearInterval(boardTimer));
+  $('#bA').onclick = () => showBoard('all'); $('#bC').onclick = () => showBoard('cls'); $('#bX').onclick = closeModal;
+  const s = summary();
+  if (!SCRIPT_URL) { $('#bL').innerHTML = `<p>排行榜還沒有設定喔！請老師依照「排行榜設定說明」完成設定。</p><p>你目前的成績：<b>${s.score}</b> 分（通關 ${s.cleared} 關）</p>`; return; }
+  const load = () => fetchTop(scope === 'cls' ? P.cls : '').then(d => { const L = $('#bL'); if (L) L.innerHTML = boardTable(d) + (d && d.myRank ? `<p>你目前是全校第 <b>${d.myRank}</b> 名。</p>` : ''); }).catch(() => { const L = $('#bL'); if (L) L.textContent = '排行榜讀取失敗，請檢查網路。'; });
+  load(); boardTimer = setInterval(load, 15000);
+}
+function teacherBoard() {
+  show('scrBoard');
+  const cls = new URLSearchParams(location.search).get('cls') || '';
+  $('#boardCls').value = cls;
+  const load = () => {
+    if (!SCRIPT_URL) { $('#bigBoard').innerHTML = '<p>排行榜還沒有設定（index.html 的 SCRIPT_URL 是空的）。</p>'; return; }
+    fetchTop($('#boardCls').value.trim()).then(d => { $('#bigBoard').innerHTML = boardTable(d); $('#boardTime').textContent = '更新於 ' + new Date().toLocaleTimeString(); }).catch(() => { $('#boardTime').textContent = '讀取失敗，稍後重試'; });
+  };
+  load(); setInterval(load, 15000);
+  $('#boardCls').onchange = load;
+  $('#boardExit').onclick = () => { location.href = location.pathname; };
+}
+
+/* =====================================================================
+   登入
+   ===================================================================== */
+function initLogin() {
+  show('scrLogin');
+  const last = store('park1_last');
+  const lp = last && store('park1_' + last);
+  $('#lastBox').innerHTML = lp ? `<button class="btn ok" id="btnCont" style="width:100%;margin-bottom:14px">▶ 繼續：${esc(lp.cls)} 班 ${esc(lp.seat)} 號 ${esc(lp.nick)}</button><div style="color:var(--sub);font-size:13px;margin-bottom:6px">或是輸入新的玩家：</div>` : '';
+  if (lp) $('#btnCont').onclick = () => login(lp);
+  $('#btnLogin').onclick = () => {
+    const cls = $('#inCls').value.trim(), seat = String(parseInt($('#inSeat').value, 10) || ''), nick = $('#inNick').value.trim().replace(/[<>"'&]/g, '');
+    if (!/^\d{3,4}$/.test(cls)) return $('#loginErr').textContent = '班級請輸入 3 位數字，例如 501';
+    if (!(seat >= 1 && seat <= 40)) return $('#loginErr').textContent = '座號請輸入 1～40';
+    if (!nick) return $('#loginErr').textContent = '請輸入名字';
+    const pid = cls + '-' + seat;
+    const old = store('park1_' + pid);
+    login(old ? Object.assign(old, { nick }) : { pid, cls, seat, nick, lv: {}, notes: {} });
+  };
+  $('#btnTeacher').onclick = () => { location.search = '?board=1'; };
+}
+function login(p) {
+  P = p; saveP(); store('park1_last', P.pid);
+  openMap();
+  if (!P.intro) { P.intro = 1; saveP(); showStory(); }
+}
+function showStory() {
+  openModal(`<h2>📜 遊樂園搶修</h2><div style="font-size:44px;text-align:center">🎡🎢🎠 🐛</div>
+  <p style="line-height:1.8">「歡樂星球遊樂園」明天就要開幕，但昨晚 <b>Bug 小精靈 🐛</b> 溜進控制室，把所有設施的程式都弄壞了！</p>
+  <p style="line-height:1.8">你是園長找來的<b>見習工程師</b>，要一區一區修好設施，讓遊樂園準時開幕。</p>
+  <ul><li>過關得 <b>100</b> 分，越快完成，時間獎勵最多 <b>+50</b></li><li>💡 提示：第 1 段 −10、第 2 段 −20、第 3 段 −30</li><li>答錯或檢查沒過，每次 −5（每關最低 20 分）</li><li>⏭ 跳過的關卡 0 分，之後可以回來挑戰</li></ul>
+  <div class="row"><button class="btn" id="mOk">出發搶修！</button></div>`);
+  $('#mOk').onclick = closeModal;
+}
+
+/* =====================================================================
+   地圖
+   ===================================================================== */
+const ZP = [[110, 440], [255, 300], [410, 165], [560, 300], [705, 165], [820, 330], [640, 460]];
+let selZone = 0;
+function zoneState(z) {
+  const ls = LEVELS.filter(L => L.z === z);
+  const done = ls.filter(finished).length;
+  return { ls, done, all: done === ls.length, open: unlocked(ls[0]) };
+}
+function openMap() {
+  show('scrMap');
+  const s = summary();
+  $('#mapPlayer').textContent = `🧑‍🔧 ${P.cls} 班 ${P.seat} 號 ${P.nick}`;
+  $('#mapScore').textContent = s.score; $('#mapDone').textContent = s.cleared;
+  const cur = LEVELS.find(L => !finished(L));
+  if (!zoneState(selZone).open) selZone = cur ? cur.z : 6;
+  drawMap(); drawZonePanel();
+  if (!cur && !P.ended) { P.ended = 1; saveP(); setTimeout(showEnding, 400); }
+}
+function drawMap() {
+  const deco = [['🌳', 40, 300, 40], ['🌳', 330, 420, 44], ['🌲', 480, 90, 40], ['🌳', 900, 470, 44], ['🎡', 880, 110, 80], ['🎈', 60, 120, 40], ['🎈', 520, 420, 34], ['☁️', 220, 70, 50], ['☁️', 640, 60, 44], ['🌷', 170, 520, 28], ['🌼', 760, 520, 28], ['🍦', 330, 210, 30], ['🎪', 920, 260, 56]];
+  let h = `<svg viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="gray"><feColorMatrix type="saturate" values="0"/></filter>
+  <radialGradient id="glow"><stop offset="0" stop-color="#fff59d" stop-opacity=".95"/><stop offset="1" stop-color="#fff59d" stop-opacity="0"/></radialGradient></defs>
+  <rect width="960" height="560" rx="28" fill="#a8e6a1"/><rect x="14" y="14" width="932" height="532" rx="22" fill="none" stroke="#7fcf77" stroke-width="6" stroke-dasharray="2 14" stroke-linecap="round"/>
+  <polyline points="${ZP.map(p => p.join(',')).join(' ')}" fill="none" stroke="#f6dfae" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="${ZP.map(p => p.join(',')).join(' ')}" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="10 12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="480" y="52" text-anchor="middle" font-size="30" font-weight="900" fill="#d9480f">🎉 歡樂星球遊樂園 🎉</text>`;
+  for (const [e, x, y, s] of deco) h += `<text x="${x}" y="${y}" font-size="${s}" text-anchor="middle">${e}</text>`;
+  ZONES.forEach((Z, z) => {
+    const st = zoneState(z), [x, y] = ZP[z], cur = st.open && !st.all, sel = z === selZone;
+    h += `<g class="zoneNode ${st.open ? '' : 'locked'}" data-z="${z}">`;
+    if (st.all) h += `<circle cx="${x}" cy="${y}" r="76" fill="url(#glow)"/>`;
+    h += `<g class="${cur ? 'pulse' : ''}"><circle cx="${x}" cy="${y}" r="48" fill="${st.all ? '#fff7c2' : '#fff'}" stroke="${sel ? '#ff7a59' : st.all ? '#f4b400' : '#c9bfa9'}" stroke-width="${sel ? 7 : 5}"/>
+      <text x="${x}" y="${y + 19}" font-size="52" text-anchor="middle" ${st.open ? '' : 'filter="url(#gray)" opacity=".45"'}>${Z.i}</text></g>`;
+    if (!st.open) h += `<text x="${x + 32}" y="${y - 26}" font-size="26" text-anchor="middle">🔒</text>`;
+    else if (st.all) h += `<text x="${x + 34}" y="${y - 28}" font-size="26" text-anchor="middle">✨</text>`;
+    else h += `<g><rect x="${x + 14}" y="${y - 52}" width="54" height="30" rx="15" fill="#ff5d5d"/><text x="${x + 41}" y="${y - 31}" font-size="17" font-weight="bold" fill="#fff" text-anchor="middle">🐛×${st.ls.length - st.done}</text></g>`;
+    h += `<rect x="${x - 62}" y="${y + 56}" width="124" height="28" rx="14" fill="${st.open ? '#fff' : '#eee'}" stroke="#e0d3b8" stroke-width="2"/><text x="${x}" y="${y + 76}" font-size="16" font-weight="bold" text-anchor="middle" fill="#2b2440">${z + 1}. ${Z.n}</text></g>`;
+  });
+  h += '</svg>';
+  $('#mapSvg').innerHTML = h;
+  document.querySelectorAll('.zoneNode').forEach(g => g.onclick = () => { const z = +g.dataset.z; if (!zoneState(z).open) return toast('🔒 先完成前面的區域才能進來喔！'); selZone = z; drawMap(); drawZonePanel(); });
+}
+function drawZonePanel() {
+  const Z = ZONES[selZone], st = zoneState(selZone);
+  let h = `<div style="font-size:48px">${Z.i}</div><h2 style="margin:4px 0">${selZone + 1}. ${Z.n}</h2><div class="badge" style="margin:0">${Z.topic}</div>
+  <div style="margin-top:10px"><button class="btn ghost small" id="btnZN">📒 工程師筆記</button></div><div class="lvList">`;
+  for (const L of st.ls) {
+    const s = P.lv[L.id] || {}, open = unlocked(L);
+    const stat = s.done ? `✅ ${s.score} 分` : s.skip ? '⏭ 已跳過' : open ? '▶ 挑戰' : '🔒';
+    h += `<button class="lvBtn" data-i="${L.i}" ${open ? '' : 'disabled'}><span class="n">${L.id}</span><span class="t"><b>${L.title}</b><br><span class="s">${MODE_NAME[L.mode]}</span></span><span class="s">${stat}</span></button>`;
+  }
+  h += '</div>';
+  $('#zonePanel').innerHTML = h;
+  $('#btnZN').onclick = () => showNote(selZone);
+  document.querySelectorAll('.lvBtn').forEach(b => b.onclick = () => openLevel(LEVELS[+b.dataset.i]));
+}
+function showNote(z, then) {
+  const Z = ZONES[z];
+  openModal(`<h2>📒 工程師筆記：${Z.n}</h2><div class="badge" style="margin:0 0 6px">${Z.topic}</div><ul>${Z.note.map(n => `<li>${n}</li>`).join('')}</ul><div class="row"><button class="btn" id="mOk">我知道了！</button></div>`, then);
+  $('#mOk').onclick = closeModal;
+}
+function showEnding() {
+  const s = summary(), skipped = LEVELS.filter(L => P.lv[L.id] && P.lv[L.id].skip && !P.lv[L.id].done).length;
+  openModal(`<div style="text-align:center"><div style="font-size:60px">🎆🎡🎆</div><h2>遊樂園準時開幕了！</h2>
+  <p>謝謝見習工程師 <b>${esc(P.nick)}</b> 打敗了 Bug 小精靈！</p>
+  <div style="font-size:40px;font-weight:900;color:var(--pri)">${s.score} 分</div>
+  <p>通關 ${s.cleared} / 20 關｜總用時 ${fmtT(s.time)}｜用了 ${s.hints} 次提示</p>
+  ${skipped ? `<p style="color:var(--sub)">還有 ${skipped} 關跳過了，回去挑戰可以再加分喔！</p>` : '<p>🏅 全部通關，你是真正的除錯工程師！</p>'}</div>
+  <div class="row"><button class="btn ghost" id="mB">🏆 看排行榜</button><button class="btn" id="mOk">太棒了！</button></div>`);
+  $('#mOk').onclick = closeModal; $('#mB').onclick = () => showBoard();
+}
+
+/* =====================================================================
+   關卡畫面
+   ===================================================================== */
+let ws = null;
+function openLevel(L) {
+  if (!unlocked(L)) return;
+  stopRun();
+  const st = lvSt(L);
+  CUR = { L, st, practice: !!st.done, tab: 0, states: L.sprites.map(s => ({ blocks: { languageVersion: 0, blocks: s.code() } })), world: makeWorld(L), rt: null, phase: L.mode === 'CB' ? 'quiz' : null, solved: false, wrongOpts: {}, testIdx: 0, demo: false };
+  show('scrLevel');
+  $('#lvId').textContent = L.id; $('#lvName').textContent = L.title; $('#lvMode').textContent = MODE_NAME[L.mode] + (CUR.practice ? '｜練習模式' : '');
+  renderTabs(); buildWs(); renderTask(); renderTests(); updateHud();
+  $('#btnDemo').style.display = (L.mode === 'A' || L.mode === 'A2' || L.mode === 'B') ? '' : 'none';
+  $('#stNote').innerHTML = CUR.practice ? '這關已經過關了，現在是<b>練習模式</b>，不會改變分數。' : '';
+  const firstOfZone = !P.notes[L.z];
+  if (firstOfZone) { P.notes[L.z] = 1; saveP(); showNote(L.z); }
+}
+function isLocked() { const m = CUR.L.mode; return m === 'A' || m === 'A2' || m === 'C' || (m === 'CB' && CUR.phase === 'quiz'); }
+function buildWs() {
+  if (ws) { ws.dispose(); ws = null; }
+  const locked = isLocked(), L = CUR.L;
+  const opts = { renderer: 'zelos', theme: THEME, media: 'https://cdn.jsdelivr.net/npm/blockly@10.4.3/media/', trashcan: !locked, sounds: false, zoom: { controls: true, wheel: false, startScale: locked ? 0.95 : 0.85, maxScale: 1.6, minScale: 0.4 }, move: { scrollbars: true, drag: true, wheel: true }, grid: { spacing: 28, length: 2, colour: '#e3e6ee', snap: false } };
+  if (!locked && L.toolbox) opts.toolbox = { kind: 'flyoutToolbox', contents: L.toolbox().map(b => ({ kind: 'block', ...b })) };
+  ws = Blockly.inject($('#ws'), opts);
+  loadTab();
+  ws.addChangeListener(e => {
+    if (e.type === Blockly.Events.CLICK && e.targetType === 'block' && e.blockId && CUR && (CUR.L.mode === 'A') && !CUR.solved) pickBlock(e.blockId);
+  });
+  setTimeout(() => Blockly.svgResize(ws), 50);
+}
+function loadTab() {
+  Blockly.Events.disable();
+  try { ws.clear(); Blockly.serialization.workspaces.load(CUR.states[CUR.tab], ws); } finally { Blockly.Events.enable(); }
+  if (isLocked()) ws.getAllBlocks(false).forEach(b => { b.setMovable(false); b.setDeletable(false); b.setEditable(false); });
+}
+function saveTab() { if (ws && CUR) CUR.states[CUR.tab] = Blockly.serialization.workspaces.save(ws); }
+function renderTabs() {
+  const L = CUR.L;
+  if (L.sprites.length < 2) { $('#tabs').innerHTML = ''; return; }
+  $('#tabs').innerHTML = L.sprites.map((s, i) => `<button class="tab ${i === CUR.tab ? 'on' : ''}" data-i="${i}">${s.emoji} ${s.name}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b => b.onclick = () => switchTab(+b.dataset.i));
+}
+function switchTab(i) { if (i === CUR.tab) return; saveTab(); CUR.tab = i; loadTab(); renderTabs(); }
+function getProgs() { saveTab(); return CUR.states.map(s => (s && s.blocks && s.blocks.blocks) || []); }
+function solProgs(L) { return L.sprites.map(s => (s.fix || s.code)()); }
+
+function renderTask() {
+  const L = CUR.L, st = CUR.st, Z = ZONES[L.z];
+  const mode = L.mode === 'CB' ? (CUR.phase === 'quiz' ? 'C' : 'B') : L.mode;
+  let h = `<div class="zoneTag">${Z.i} ${Z.n}｜${Z.topic}</div><h3>📖 狀況</h3><p>${L.story}</p>
+  <div class="goal"><b>🎯 正確的效果</b><p>${L.goal}</p></div>`;
+  if (L.mode === 'CB' && CUR.phase === 'fix') h += `<div class="fb show good">${L.phase2}</div>`;
+  h += `<div class="how">${MODE_HOW[mode]}</div>`;
+  if ((mode === 'C' || mode === 'A2') && L.quiz) {
+    h += `<div class="quizQ">❓ ${L.quiz.q}</div><div class="opts">` + L.quiz.opts.map((o, i) => {
+      const lab = Array.isArray(o) ? o[0] : o, chip = L.quiz.chip ? ` chip" style="background:${COL[o[1]]}` : '';
+      return `<button class="opt${CUR.wrongOpts[i] ? ' wrong' : ''}${chip}" data-i="${i}" ${CUR.wrongOpts[i] || CUR.solved ? 'disabled' : ''}>${esc(lab)}</button>`;
+    }).join('') + '</div>';
+  }
+  h += `<div id="fb" class="fb"></div><div id="hintBox"></div>`;
+  if (mode === 'B') h += `<div class="taskBtns"><button class="btn ok" id="btnCheck" style="font-size:17px;padding:11px">✅ 修好了！送出檢查</button><button class="btn ghost small" id="btnRestore">↺ 還原成原本的程式</button></div>`;
+  h += `<div style="margin-top:12px"><button class="linkb" id="btnNote">📒 工程師筆記</button></div>`;
+  $('#task').innerHTML = h;
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => pickOpt(+b.dataset.i));
+  if ($('#btnCheck')) $('#btnCheck').onclick = submitFix;
+  if ($('#btnRestore')) $('#btnRestore').onclick = restoreCode;
+  $('#btnNote').onclick = () => showNote(L.z);
+  renderHints();
+  $('#btnGo').disabled = mode === 'C' && !CUR.solved;
+  $('#btnGo').title = $('#btnGo').disabled ? '先猜猜看答案，選好後會自動執行' : '執行（綠旗）';
+}
+function fb(msg, kind) { const f = $('#fb'); if (!f) return; f.className = 'fb show ' + kind; f.innerHTML = msg; }
+function renderHints() {
+  const L = CUR.L, n = CUR.st.h || 0;
+  $('#hintBox').innerHTML = L.hints.slice(0, n).map((t, i) => `<div class="hintItem ${i === 1 ? 'clk' : ''}" data-i="${i}">💡 ${i + 1}. ${t}${i === 1 ? '<br><span style="font-size:12px;color:#8a6d00">（點這裡讓積木再閃一次）</span>' : ''}</div>`).join('');
+  document.querySelectorAll('.hintItem.clk').forEach(d => d.onclick = () => flashHint());
+  $('#btnHint').textContent = `💡 提示 ${n}/3`;
+  $('#btnHint').disabled = n >= 3;
+}
+function renderTests() {
+  const T = CUR.L.tests;
+  if (!T) { $('#tests').innerHTML = ''; return; }
+  $('#tests').innerHTML = '🧒 測試遊客：' + T.opts.map((o, i) => `<button class="${i === CUR.testIdx ? 'on' : ''}" data-i="${i}">${o[0]} ${o[1]} 公分</button>`).join('');
+  document.querySelectorAll('#tests button').forEach(b => b.onclick = () => { CUR.testIdx = +b.dataset.i; CUR.world.vars[T.v] = T.opts[CUR.testIdx][1]; renderTests(); });
+  CUR.world.vars[T.v] = T.opts[CUR.testIdx][1];
+}
+function updateHud() {
+  if (!CUR) return;
+  $('#lvTime').textContent = fmtT(CUR.st.t || 0);
+  $('#lvPot').innerHTML = CUR.practice ? '練習模式' : `本關可得 <b>${calcScore(CUR.st).total}</b> 分`;
+}
+setInterval(() => {
+  if (!CUR || !$('#scrLevel').classList.contains('on') || CUR.practice || CUR.solved) return;
+  if (document.visibilityState !== 'visible') return;
+  CUR.st.t = (CUR.st.t || 0) + 1;
+  if (CUR.st.t % 5 === 0) saveP();
+  updateHud();
+}, 1000);
+
+/* ---------------- 執行 ---------------- */
+function stopRun() { if (CUR && CUR.rt) { CUR.rt.stop(); CUR.rt = null; } if (ws) ws.highlightBlock(null); }
+function runVisible(progs, isDemo) {
+  stopRun();
+  const L = CUR.L, w = CUR.world;
+  w.sprites.forEach(s => s.say = '');
+  if (L.tests) w.vars[L.tests.v] = L.tests.opts[CUR.testIdx][1];
+  CUR.demo = !!isDemo;
+  const rt = new Runtime(L, w, { progs, onBlock: (sp, bid) => { if (!isDemo && ws && sp.idx === CUR.tab && bid) ws.highlightBlock(bid); } });
+  CUR.rt = rt;
+  return rt.start().then(() => { if (CUR && CUR.rt === rt) { CUR.rt = null; CUR.demo = false; if (ws) ws.highlightBlock(null); } return rt; });
+}
+function greenFlag() { if ($('#btnGo').disabled) return; runVisible(getProgs()); }
+$('#btnGo').onclick = greenFlag;
+$('#btnStop').onclick = () => { stopRun(); if (CUR) CUR.demo = false; };
+$('#btnReset').onclick = () => { stopRun(); CUR.world = makeWorld(CUR.L); renderTests(); toast('舞台已重置'); };
+$('#btnDemo').onclick = () => { CUR.world = makeWorld(CUR.L); renderTests(); runVisible(solProgs(CUR.L), true); };
+$('#cv').onclick = ev => {
+  if (!CUR) return;
+  const r = ev.target.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * 480 - 240, y = 180 - (ev.clientY - r.top) / r.height * 360;
+  const sp = [...CUR.world.sprites].reverse().find(s => s.visible && Math.hypot(s.x - x, s.y - y) < s.size / 2);
+  if (!sp) return;
+  const progs = getProgs();
+  if (CUR.rt) { CUR.rt.hats('ev_click', null, sp).forEach(([s, t]) => CUR.rt.spawn(s, t)); return; }
+  const rt = new Runtime(CUR.L, CUR.world, { progs }); CUR.rt = rt;
+  rt.start('ev_click', sp).then(() => { if (CUR && CUR.rt === rt) CUR.rt = null; });
+};
+
+/* ---------------- 作答 ---------------- */
+function wrong(msg) { if (!CUR.practice) { CUR.st.w = (CUR.st.w || 0) + 1; saveP(); updateHud(); } fb(msg + (CUR.practice ? '' : '（−5 分）'), 'bad'); }
+function pickBlock(bid) {
+  let b = ws.getBlockById(bid), hit = false;
+  while (b) { if (CUR.L.answer.includes(b.id)) { hit = true; break; } b = b.outputConnection ? b.getParent() : b.getSurroundParent(); }
+  if (hit) { ws.highlightBlock(null); ws.highlightBlock(b.id); success(); }
+  else wrong('🙅 這塊積木沒有問題喔，再找找看！');
+}
+async function pickOpt(i) {
+  const L = CUR.L, ok = i === L.quiz.ans;
+  if (L.mode === 'A2') {
+    if (ok) { document.querySelector(`.opt[data-i="${i}"]`).classList.add('right'); success(); }
+    else { CUR.wrongOpts[i] = 1; renderTask(); wrong('🙅 不是這塊喔！想想小兔為什麼會從門口出發。'); }
+    return;
+  }
+  // C：先猜再跑
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  fb('🏁 執行程式驗證中……', 'info');
+  const rt = await runVisible(getProgs());
+  if (!CUR || CUR.L !== L) return;
+  if (ok) {
+    document.querySelector(`.opt[data-i="${i}"]`).classList.add('right');
+    if (L.mode === 'CB') { CUR.phase = 'fix'; CUR.wrongOpts = {}; buildWs(); renderTask(); toast('猜對了！現在動手把它修好 🔧'); }
+    else success();
+  } else { CUR.wrongOpts[i] = 1; renderTask(); wrong('🤔 執行結果和你猜的不一樣喔！看看舞台，再想一次。'); }
+}
+async function submitFix() {
+  const L = CUR.L, progs = getProgs();
+  $('#btnCheck').disabled = true;
+  let r;
+  try { r = await L.check(over => runFast(L, progs, over)); } catch (e) { console.error(e); r = FAIL('檢查時發生錯誤，請再試一次。'); }
+  if (!CUR || CUR.L !== L) return;
+  if ($('#btnCheck')) $('#btnCheck').disabled = false;
+  if (r.ok) { success(); return; }
+  wrong('🔧 還沒修好：' + r.msg);
+  if (!CUR.solved) runVisible(progs);
+}
+function restoreCode() {
+  openModal('<h2>↺ 還原程式？</h2><p>你改過的積木會全部消失，變回一開始有 Bug 的程式。</p><div class="row"><button class="btn ghost" id="mN">取消</button><button class="btn" id="mY">還原</button></div>');
+  $('#mN').onclick = closeModal;
+  $('#mY').onclick = () => { closeModal(); stopRun(); CUR.states = CUR.L.sprites.map(s => ({ blocks: { languageVersion: 0, blocks: s.code() } })); CUR.world = makeWorld(CUR.L); loadTab(); renderTests(); };
+}
+function success() {
+  const L = CUR.L, st = CUR.st;
+  CUR.solved = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if ($('#btnCheck')) $('#btnCheck').disabled = true;
+  $('#btnGo').disabled = false;
+  fb('🎉 答對了！', 'good');
+  const next = LEVELS[L.i + 1];
+  let body;
+  if (CUR.practice) body = '<p>練習完成！（這關的分數不會改變）</p>';
+  else {
+    const c = calcScore(st);
+    st.done = true; st.score = c.total; saveP(); upload();
+    body = `<table class="scoreTbl"><tr><td>過關分</td><td>100</td></tr><tr><td>時間獎勵（用時 ${fmtT(st.t)}）</td><td>+${c.tb}</td></tr><tr><td>提示（${st.h || 0} 段）</td><td>−${c.hc}</td></tr><tr><td>答錯（${st.w || 0} 次）</td><td>−${c.wc}</td></tr><tr class="tot"><td>本關得分</td><td>${c.total} 分</td></tr></table>`;
+  }
+  setTimeout(() => {
+    openModal(`<div style="text-align:center;font-size:50px">${L.boss ? '🏆🎆🏆' : '🎉🔧✨'}</div><h2 style="text-align:center">${L.boss ? '打敗 Bug 小精靈！' : '修好了！'}</h2>${body}<div class="explain">💬 ${L.explain}</div>
+    <div class="row"><button class="btn ghost" id="mMap">回地圖</button>${next ? '<button class="btn" id="mNext">下一關 ▶</button>' : ''}</div>`);
+    $('#mMap').onclick = () => { closeModal(); leaveLevel(); };
+    if (next) $('#mNext').onclick = () => { closeModal(); if (next.z !== L.z) { leaveLevel(); selZone = next.z; } openLevel(next); };
+  }, L.mode === 'A' || L.mode === 'A2' ? 500 : 900);
+}
+function leaveLevel() { stopRun(); saveP(); CUR = null; openMap(); }
+$('#btnBack').onclick = leaveLevel;
+$('#btnHint').onclick = () => {
+  const st = CUR.st, n = st.h || 0;
+  if (n >= 3) return;
+  const cost = [10, 20, 30][n];
+  openModal(`<h2>💡 使用第 ${n + 1} 段提示？</h2><p>${CUR.practice ? '練習模式不扣分。' : `會扣 <b>${cost}</b> 分喔！`}</p>${n === 1 ? '<p>第 2 段提示會讓可疑的積木<b>閃爍</b>。</p>' : ''}<div class="row"><button class="btn ghost" id="mN">再想想</button><button class="btn" id="mY">使用提示</button></div>`);
+  $('#mN').onclick = closeModal;
+  $('#mY').onclick = () => { closeModal(); st.h = n + 1; saveP(); renderHints(); updateHud(); if (st.h >= 2) flashHint(); };
+};
+function flashHint() {
+  const list = CUR.L.hl || [];
+  if (!list.length) return;
+  if (!list.some(x => x[0] === CUR.tab)) switchTab(list[0][0]);
+  clearInterval(CUR.flashT);
+  let n = 0;
+  const mine = () => list.filter(x => x[0] === CUR.tab && ws.getBlockById(x[1]));
+  CUR.flashT = setInterval(() => {
+    if (!CUR || !ws) return;
+    mine().forEach(x => ws.highlightBlock(x[1], n % 2 === 0));
+    if (++n >= 9) { clearInterval(CUR.flashT); mine().forEach(x => ws.highlightBlock(x[1], true)); }
+  }, 350);
+}
+$('#btnSkip').onclick = () => {
+  if (CUR.practice || CUR.st.done) return toast('這關已經過關囉！');
+  openModal('<h2>⏭ 跳過這關？</h2><p>跳過的關卡是 <b>0 分</b>，但之後可以回來重新挑戰。</p><div class="row"><button class="btn ghost" id="mN">繼續挑戰</button><button class="btn" id="mY">跳過</button></div>');
+  $('#mN').onclick = closeModal;
+  $('#mY').onclick = () => {
+    closeModal(); const L = CUR.L; CUR.st.skip = true; saveP(); upload();
+    const next = LEVELS[L.i + 1];
+    if (next && next.z === L.z) openLevel(next); else { if (next) selZone = next.z; leaveLevel(); }
+  };
+};
+
+/* =====================================================================
+   舞台繪圖
+   ===================================================================== */
+const cv = $('#cv'), ctx = cv.getContext('2d');
+(function () { const d = Math.min(2, window.devicePixelRatio || 1); cv.width = 480 * d; cv.height = 360 * d; ctx.setTransform(d, 0, 0, d, 0, 0); })();
+const EMO = '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+function emo(ch, x, y, s, a) { ctx.save(); if (a != null) ctx.globalAlpha = a; ctx.font = `${s}px ${EMO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ch, x, y); ctx.restore(); }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+const STARS = Array.from({ length: 40 }, (_, i) => [(i * 97) % 480, (i * 53) % 200, (i % 3) + 1]);
+function drawBg(key) {
+  const g = ctx.createLinearGradient(0, 0, 0, 360);
+  if (key === 'finale') { g.addColorStop(0, '#141b4d'); g.addColorStop(1, '#3b2a6b'); }
+  else if (key === 'carousel') { g.addColorStop(0, '#fdf0ff'); g.addColorStop(1, '#fff8fb'); }
+  else { g.addColorStop(0, '#bfe8ff'); g.addColorStop(1, '#eef9ff'); }
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 480, 360);
+  const ground = c => { ctx.fillStyle = c || '#9be08a'; ctx.fillRect(0, 262, 480, 98); };
+  switch (key) {
+    case 'gate': ground(); ctx.fillStyle = '#f2dcae'; ctx.fillRect(0, 262, 480, 26); emo('🏰', 412, 200, 120); emo('🎈', 455, 70, 32); emo('🎈', 360, 90, 26); emo('☁️', 90, 50, 44); emo('🌳', 30, 238, 46); break;
+    case 'carousel':
+      ctx.strokeStyle = '#efd9f2'; ctx.lineWidth = 1;
+      for (let x = 40; x < 480; x += 50) { ctx.beginPath(); ctx.moveTo(x - 30 + 30, 0); ctx.lineTo(x, 360); ctx.stroke(); }
+      for (let y = 30; y < 360; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(480, y); ctx.stroke(); }
+      emo('🎠', 435, 320, 60, 0.35); emo('🎵', 40, 40, 28, 0.5); break;
+    case 'coaster': ground(); emo('🎢', 120, 120, 150, 0.35); ctx.fillStyle = '#8d6e63'; ctx.fillRect(0, 246, 480, 6); for (let x = 6; x < 480; x += 22) ctx.fillRect(x, 252, 6, 10); emo('🏁', 452, 205, 36); emo('🚩', 26, 205, 28); break;
+    case 'ticket': ground(); ctx.fillStyle = '#ffe3c2'; rr(250, 110, 210, 150, 12); ctx.fill(); ctx.fillStyle = '#ff8c1a'; rr(250, 100, 210, 34, 10); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 18px "Microsoft JhengHei",sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🎫 售票處', 355, 123); emo('🎟️', 320, 200, 44); emo('💰', 400, 205, 40); break;
+    case 'radio': ground('#c9b6ff'); ctx.fillStyle = '#7b5cd6'; ctx.fillRect(0, 262, 480, 14); emo('📢', 40, 60, 40); emo('🔊', 440, 230, 34); emo('🎤', 80, 230, 30, 0.6); emo('✨', 300, 40, 26, 0.6); break;
+    case 'queue': ground(); emo('🎡', 400, 150, 140, 0.45); for (let x = 30; x < 480; x += 70) emo('🚧', x, 290, 30); break;
+    case 'finale': ctx.fillStyle = '#fff'; for (const [x, y, r] of STARS) { ctx.globalAlpha = 0.4 + r * 0.2; ctx.beginPath(); ctx.arc(x, y, r * 0.8, 0, 7); ctx.fill(); } ctx.globalAlpha = 1; emo('🌙', 430, 50, 44); ctx.fillStyle = '#231a45'; ctx.fillRect(0, 280, 480, 80); emo('🏰', 380, 240, 100, 0.55); break;
+  }
+}
+function drawStage() {
+  requestAnimationFrame(drawStage);
+  if (!CUR || !$('#scrLevel').classList.contains('on')) return;
+  const w = CUR.world, L = CUR.L;
+  drawBg(L.bg);
+  ctx.lineCap = 'round'; ctx.lineWidth = 5;
+  for (const l of w.lines) { ctx.strokeStyle = l.c; ctx.beginPath(); ctx.moveTo(240 + l.x1, 180 - l.y1); ctx.lineTo(240 + l.x2, 180 - l.y2); ctx.stroke(); }
+  for (const s of w.sprites) {
+    if (!s.visible) continue;
+    ctx.save(); ctx.translate(240 + s.x, 180 - s.y);
+    if (s.rotate) ctx.rotate((s.dir - 90) * Math.PI / 180);
+    if (s.faceLeft) ctx.scale(-1, 1);
+    ctx.font = `${s.size}px ${EMO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s.emoji, 0, 0);
+    ctx.restore();
+  }
+  for (const s of w.sprites) if (s.visible && s.say !== '') bubble(s);
+  // 變數、清單監視器
+  let my = 8;
+  for (const n of L.varNames) {
+    ctx.font = 'bold 13px "Microsoft JhengHei",sans-serif';
+    const v = String(w.vars[n]), tw = ctx.measureText(n).width, vw = Math.max(28, ctx.measureText(v).width + 14);
+    ctx.fillStyle = '#f4f4f4'; ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 1; rr(8, my, tw + vw + 22, 26, 6); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#575e75'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(n, 15, my + 13);
+    ctx.fillStyle = COL.vars; rr(tw + 20, my + 4, vw, 18, 9); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(v, tw + 20 + vw / 2, my + 13);
+    my += 32;
+  }
+  for (const n of L.listNames) {
+    const items = w.lists[n] || [], bx = 340, bw = 130, bh = Math.max(60, 46 + items.length * 22);
+    ctx.fillStyle = '#f4f4f4'; ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 1; rr(bx, 8, bw, bh, 6); ctx.fill(); ctx.stroke();
+    ctx.font = 'bold 13px "Microsoft JhengHei",sans-serif'; ctx.fillStyle = '#575e75'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n, bx + bw / 2, 20);
+    items.forEach((it, i) => { const y = 32 + i * 22; ctx.fillStyle = '#575e75'; ctx.textAlign = 'left'; ctx.font = '12px sans-serif'; ctx.fillText(i + 1, bx + 6, y + 9); ctx.fillStyle = COL.lists; rr(bx + 22, y, bw - 30, 19, 4); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Microsoft JhengHei",sans-serif'; ctx.fillText(it, bx + 28, y + 10); });
+    ctx.fillStyle = '#575e75'; ctx.font = '12px "Microsoft JhengHei",sans-serif'; ctx.textAlign = 'center'; ctx.fillText('項目數量：' + items.length, bx + bw / 2, 8 + bh - 10);
+  }
+  if (CUR.demo) { ctx.fillStyle = 'rgba(43,182,115,.92)'; rr(150, 326, 180, 26, 13); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 14px "Microsoft JhengHei",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('👀 示範：正確的效果', 240, 339); }
+}
+function bubble(s) {
+  ctx.font = 'bold 15px "Microsoft JhengHei",sans-serif';
+  const t = s.say, tw = Math.min(200, ctx.measureText(t).width), bw = tw + 22, bh = 32;
+  let bx = 240 + s.x + s.size * 0.25, by = 180 - s.y - s.size * 0.5 - bh - 10;
+  bx = Math.max(4, Math.min(476 - bw, bx)); by = Math.max(4, by);
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#b8b8c8'; ctx.lineWidth = 2;
+  rr(bx, by, bw, bh, 14); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx + 16, by + bh - 1); ctx.lineTo(bx + 10, by + bh + 10); ctx.lineTo(bx + 28, by + bh - 1); ctx.fill();
+  ctx.fillStyle = '#2b2440'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(t, bx + 11, by + bh / 2, 200);
+}
+
+/* =====================================================================
+   啟動
+   ===================================================================== */
+let THEME;
+window.addEventListener('resize', () => { if (ws) Blockly.svgResize(ws); });
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+$('#btnBoard').onclick = () => showBoard();
+$('#btnStory').onclick = showStory;
+$('#btnLogout').onclick = () => { P = null; store('park1_last', ''); initLogin(); };
+// 開發測試：在主控台執行 await __selftest()，確認每關「原本的程式不會過、正解會過」
+window.__selftest = async function () {
+  const out = [];
+  for (const L of LEVELS) {
+    if (!L.check) continue;
+    const bug = await L.check(o => runFast(L, L.sprites.map(s => s.code()), o));
+    const fix = await L.check(o => runFast(L, solProgs(L), o));
+    out.push(`${L.id} 原本:${bug.ok ? '過✗' : '不過✓'} 正解:${fix.ok ? '過✓' : '不過✗ ' + fix.msg}`);
+  }
+  return out.join('\n');
+};
+(function boot() {
+  if (!window.Blockly) { document.body.innerHTML = '<div style="padding:40px;font-size:20px">⚠️ 積木程式庫載入失敗，請確認網路連線後重新整理。</div>'; return; }
+  defBlocks();
+  THEME = Blockly.Theme.defineTheme('park', { base: Blockly.Themes.Classic, fontStyle: { family: '"Microsoft JhengHei","PingFang TC",sans-serif', weight: 'bold', size: 12 }, componentStyles: { workspaceBackgroundColour: '#F9F9FB', flyoutBackgroundColour: '#EEF1F7', flyoutOpacity: 1, scrollbarColour: '#cfd3de', insertionMarkerColour: '#000000' } });
+  requestAnimationFrame(drawStage);
+  if (new URLSearchParams(location.search).get('board')) return teacherBoard();
+  initLogin();
+})();
+</script>
+</body>
+</html>
