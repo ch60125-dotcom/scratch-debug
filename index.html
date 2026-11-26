@@ -41,21 +41,21 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 /* ---------- 按鈕（立體果凍感） ---------- */
 .btn{
   position:relative;border:0;border-radius:12px;padding:8px 15px;
-  background:linear-gradient(180deg,#ff8a6c 0%,var(--pri) 55%,#f45b39 100%);
+  background:linear-gradient(180deg,#e8603f 0%,#c94420 55%,#b53a18 100%);
   color:#fff;font-weight:bold;letter-spacing:.04em;
-  box-shadow:0 4px 0 var(--pri-d),0 6px 12px rgba(217,72,43,.25),inset 0 1px 0 rgba(255,255,255,.45);
+  box-shadow:0 4px 0 #8f2e12,0 6px 12px rgba(143,46,18,.25),inset 0 1px 0 rgba(255,255,255,.35);
   text-shadow:0 1px 0 rgba(0,0,0,.15);
   transition:transform .08s,box-shadow .08s,filter .15s;
 }
 .btn:hover{filter:brightness(1.06) saturate(1.05)}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pri-d),0 2px 4px rgba(217,72,43,.2),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8f2e12,0 2px 4px rgba(217,72,43,.2),inset 0 1px 0 rgba(255,255,255,.35)}
 .btn.ghost{
   background:linear-gradient(#fff,#fff9ef);color:var(--ink);border:2px solid var(--line2);
   box-shadow:0 3px 0 var(--line2);text-shadow:none;
 }
 .btn.ghost:active{box-shadow:0 0 0 var(--line2)}
-.btn.ok{background:linear-gradient(180deg,#3fcf96 0%,var(--ok) 55%,#1a9e6e 100%);box-shadow:0 4px 0 var(--ok-d),0 6px 12px rgba(21,132,91,.25),inset 0 1px 0 rgba(255,255,255,.45)}
-.btn.ok:active{box-shadow:0 1px 0 var(--ok-d)}
+.btn.ok{background:linear-gradient(180deg,#25a574 0%,#15845b 55%,#11704d 100%);box-shadow:0 4px 0 #0c5a3d,0 6px 12px rgba(12,90,61,.25),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.ok:active{box-shadow:0 1px 0 #0c5a3d}
 .btn.small{padding:5px 11px;font-size:13px;border-radius:10px}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 #btnHint{box-shadow:0 4px 0 var(--pri2-d),inset 0 1px 0 rgba(255,255,255,.5);text-shadow:none;background:linear-gradient(#ffd45e,var(--pri2)) !important}
@@ -77,7 +77,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .brand{font-family:var(--font-title);font-size:23px;font-weight:900;color:var(--pri);letter-spacing:.06em;text-shadow:0 2px 0 #ffd9cc}
 .sp{flex:1}
 .pill{background:linear-gradient(#fff8e3,#ffefc4);border:2px solid #f5dc9c;border-radius:20px;padding:4px 12px;font-size:14px;white-space:nowrap;box-shadow:inset 0 -2px 0 rgba(217,154,11,.15)}
-.pill b{color:#b45309}
+.pill b{color:#92400e}
 .badge{display:inline-block;border-radius:9px;padding:2px 9px;font-size:13px;background:var(--blue-l);color:#2d5bd7;margin-left:6px;vertical-align:middle;font-weight:bold;border:1.5px solid #cfe0ff}
 
 /* ---------- 登入畫面：天空＋遊樂園剪影＋氣球＋彩旗 ---------- */
@@ -118,7 +118,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .field label{width:64px;font-weight:bold;font-size:16px}
 .field input{flex:1;border:2px solid var(--line2);border-radius:12px;padding:10px 12px;font-size:16px;font-family:inherit;background:#fffdf8;box-shadow:inset 0 2px 0 rgba(120,80,20,.06);transition:border-color .15s,box-shadow .15s}
 .field input:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(76,151,255,.2)}
-.err{color:var(--bad);min-height:22px;font-size:14px;font-weight:bold}
+.err{color:#c62828;min-height:22px;font-size:14px;font-weight:bold}
 .linkb{background:none;border:0;color:#2d5bd7;text-decoration:underline;text-underline-offset:3px;padding:4px;font-weight:bold}
 .linkb:hover{color:var(--pri-d)}
 
@@ -146,7 +146,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .lvBtn:hover:not(:disabled){border-color:var(--pri);box-shadow:0 3px 0 #ffb9a6;transform:translateY(-1px)}
 .lvBtn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
 .lvBtn:disabled{opacity:.5;cursor:not-allowed;background:#f7f3ea}
-.lvBtn .n{font-weight:900;color:#fff;background:var(--pri);border-radius:10px;min-width:40px;width:auto;padding:4px 0;text-align:center;font-size:14px;box-shadow:0 2px 0 var(--pri-d)}
+.lvBtn .n{font-weight:900;color:#fff;background:#c94420;border-radius:10px;min-width:40px;width:auto;padding:4px 0;text-align:center;font-size:14px;box-shadow:0 2px 0 var(--pri-d)}
 .lvBtn:disabled .n{background:#b9b0a0;box-shadow:0 2px 0 #9a917f}
 .lvBtn .t{flex:1;font-size:15px}
 .lvBtn .s{font-size:13px;color:var(--sub)}
@@ -165,7 +165,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .opt{border:2px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;text-align:left;font-size:15px;box-shadow:0 3px 0 var(--line);transition:transform .08s,border-color .15s}
 .opt:hover:not(:disabled){border-color:var(--blue);box-shadow:0 3px 0 #b9d4ff}
 .opt:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
-.opt.chip{color:#fff;border:0;font-weight:bold;border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.2);text-shadow:0 1px 0 rgba(0,0,0,.2)}
+.opt.chip{background:#fff;color:var(--ink);border:2px solid var(--c);border-left:14px solid var(--c);font-weight:bold;border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.12);text-shadow:none}
 .opt.wrong{opacity:.45;text-decoration:line-through;box-shadow:none}
 .opt.right{outline:3px solid var(--ok);outline-offset:1px;background:var(--ok-l)}
 .fb{margin:10px 0;border-radius:12px;padding:0;font-size:15px;line-height:1.55}
@@ -184,7 +184,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .tabs{display:flex;gap:6px}
 .tab{border:2px solid var(--line);border-bottom:0;background:#f6efe0;border-radius:12px 12px 0 0;padding:6px 14px;font-weight:bold;color:var(--sub)}
 .tab:hover{background:#fff7ea}
-.tab.on{background:#fff;color:var(--pri);box-shadow:inset 0 3px 0 var(--pri)}
+.tab.on{background:#fff;color:#c2410c;box-shadow:inset 0 3px 0 var(--pri)}
 #wsWrap{flex:1;position:relative;border-radius:0 14px 14px 14px;overflow:hidden;border:2px solid var(--line);background:#fff;box-shadow:var(--shadow)}
 .tabs:empty+#wsWrap{border-radius:14px}
 #ws{position:absolute;inset:0}
@@ -201,7 +201,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .tests{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
 .tests button{border:2px solid var(--line);background:#fff;border-radius:20px;padding:4px 11px;font-size:13px;box-shadow:0 2px 0 var(--line)}
 .tests button:hover{border-color:var(--blue)}
-.tests button.on{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 2px 0 var(--blue-d)}
+.tests button.on{background:#3373cc;color:#fff;border-color:#3373cc;box-shadow:0 2px 0 var(--blue-d)}
 .stNote{font-size:13px;color:var(--sub);line-height:1.55}
 
 /* ---------- 彈窗 ---------- */
@@ -222,7 +222,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .scoreTbl{width:100%;border-collapse:separate;border-spacing:0;margin:10px 0;background:#fffaf0;border-radius:12px;overflow:hidden;border:2px solid #f6ead4}
 .scoreTbl td{padding:7px 10px;border-bottom:1px dashed #efdfc3}
 .scoreTbl td:last-child{text-align:right;font-weight:bold}
-.scoreTbl tr.tot td{font-size:19px;color:var(--pri);border-bottom:0;background:#fff1d6;font-weight:900}
+.scoreTbl tr.tot td{font-size:19px;color:#c2410c;border-bottom:0;background:#fff1d6;font-weight:900}
 .explain{background:var(--blue-l);border:2px solid #d3e4ff;border-radius:12px;padding:10px 14px;line-height:1.65}
 .board{width:100%;border-collapse:collapse}
 .board th,.board td{padding:7px 6px;text-align:center;border-bottom:1px solid #f0e8da}
@@ -309,6 +309,8 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
   #zonePanel{width:300px}
 }
 @media (max-width:1100px){
+  .lvMain{grid-template-columns:210px 1fr 300px}
+  #btnCheck{font-size:15px!important;padding:9px 6px!important;white-space:nowrap}
   .task h3{font-size:16px;margin:2px 0 4px}
   .task p{margin:2px 0 8px;line-height:1.5}
   .zoneTag{display:none}
@@ -412,9 +414,10 @@ const fmtT = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart
 const clone = o => JSON.parse(JSON.stringify(o));
 function toast(msg, ms) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), ms || 2200); }
 function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-let modalClose = null;
-function openModal(html, onClose) { $('#modalBox').innerHTML = html; $('#modal').classList.add('on'); modalClose = onClose || null; }
-function closeModal() { $('#modal').classList.remove('on'); const f = modalClose; modalClose = null; if (f) f(); }
+let modalClose = null, modalSticky = false;
+// sticky：點旁邊的暗色背景不會關（過關、結局視窗用，避免「下一關」按鈕不見）
+function openModal(html, onClose, sticky) { $('#modalBox').innerHTML = html; $('#modal').classList.add('on'); modalClose = onClose || null; modalSticky = !!sticky; }
+function closeModal() { $('#modal').classList.remove('on'); modalSticky = false; const f = modalClose; modalClose = null; if (f) f(); }
 function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); }
 
 /* =====================================================================
@@ -544,12 +547,18 @@ function makeWorld(L, over) {
   return w;
 }
 class Runtime {
-  constructor(L, w, o) { this.L = L; this.w = w; this.fast = !!o.fast; this.progs = o.progs; this.onBlock = o.onBlock; this.maxMs = o.maxMs || L.maxMs || 12000; this.maxVt = 30000; this.trace = []; this.threads = new Set(); this.wakers = new Set(); this.timers = []; this.seq = 0; this.vt = 0; this.stopped = false; this.stopAll = false; this.timedOut = false; this.steps = 0; this.t0 = performance.now(); }
+  constructor(L, w, o) { this.L = L; this.w = w; this.fast = !!o.fast; this.progs = o.progs; this.onBlock = o.onBlock; this.maxMs = o.maxMs || L.maxMs || 12000; this.maxVt = 30000; this.trace = []; this.threads = new Set(); this.running = new Map(); this.thSeq = 0; this.wakers = new Set(); this.timers = []; this.seq = 0; this.vt = 0; this.stopped = false; this.stopAll = false; this.timedOut = false; this.steps = 0; this.t0 = performance.now(); }
   now() { return this.fast ? this.vt : performance.now() - this.t0; }
   log(e) { e.time = this.now(); this.trace.push(e); }
   hats(type, pred, onlySp) { const out = []; this.w.sprites.forEach((sp, i) => { if (onlySp && onlySp !== sp) return; for (const t of (this.progs[i] || [])) if (t.type === type && t.enabled !== false && (!pred || pred(t))) out.push([sp, t]); }); return out; }
-  spawn(sp, top) {
-    const p = (async () => { try { await this.exec(top.next && top.next.block, sp, top.type); } catch (e) { if (!(e instanceof StopErr)) console.error(e); } })();
+  // 和 Scratch 一樣：同一個帽子積木的程式還在跑時又被觸發，舊的會停掉、從頭重來。
+  // later：廣播觸發的程式等下一格畫面才開始（避免「收到訊息→廣播同一個訊息」無限遞迴）
+  spawn(sp, top, later) {
+    const key = sp.idx + ':' + (top.id || top.type), old = this.running.get(key);
+    if (old) old.dead = true;
+    const th = { via: top.type, id: ++this.thSeq, dead: false };
+    this.running.set(key, th);
+    const p = (async () => { try { if (later) await this.frame(); this.check(th); await this.exec(top.next && top.next.block, sp, th); } catch (e) { if (!(e instanceof StopErr)) console.error(e); } finally { if (this.running.get(key) === th) this.running.delete(key); } })();
     this.threads.add(p); p.finally(() => this.threads.delete(p));
   }
   // forceRecv：檢查用，假裝某些角色收到了廣播（用來單獨測量煙火是否轉滿一圈）
@@ -578,8 +587,8 @@ class Runtime {
     }
   }
   stop() { this.stopped = true; this.wakers.forEach(r => r()); this.wakers.clear(); const ts = this.timers; this.timers = []; ts.forEach(x => x.r()); }
-  check() {
-    if (this.stopped) throw new StopErr();
+  check(th) {
+    if (this.stopped || (th && th.dead)) throw new StopErr();
     this.steps++;
     if (this.fast ? this.steps > 30000 : performance.now() - this.t0 > this.maxMs) { this.timedOut = true; this.stop(); throw new StopErr(); }
   }
@@ -608,7 +617,7 @@ class Runtime {
     }
     return 0;
   }
-  async exec(b, sp, via) { for (; b; b = b.next && b.next.block) { if (b.enabled === false) continue; await this.step(b, sp, via); } }
+  async exec(b, sp, th) { for (; b; b = b.next && b.next.block) { if (b.enabled === false) continue; await this.step(b, sp, th); } }
   async glide(sp, tx, ty, dur) {
     tx = Math.max(-225, Math.min(225, tx)); ty = Math.max(-165, Math.min(165, ty));
     const x0 = sp.x, y0 = sp.y; let line = null;
@@ -620,16 +629,16 @@ class Runtime {
     sp.x = tx; sp.y = ty; if (line) { line.x2 = tx; line.y2 = ty; }
     this.log({ k: 'pos', s: sp.name, x: tx, y: ty });
   }
-  async step(b, sp, via) {
-    this.check();
+  async step(b, sp, th) {
+    this.check(th);
     if (this.onBlock) this.onBlock(sp, b.id);
-    const w = this.w, f = b.fields || {};
+    const w = this.w, f = b.fields || {}, via = th ? th.via : '', tid = th ? th.id : 0;
     switch (b.type) {
       case 'mo_move': { const n = Number(this.val(b, 'N', sp)) || 0, r = sp.dir * Math.PI / 180; await this.glide(sp, sp.x + n * Math.sin(r), sp.y + n * Math.cos(r), Math.min(450, Math.abs(n) * 4)); break; }
-      case 'mo_right': case 'mo_left': { let n = Number(this.val(b, 'N', sp)) || 0; if (b.type === 'mo_left') n = -n; sp.dir = wrapDir(sp.dir + n); sp.turned += n; this.log({ k: 'turn', s: sp.name, d: n, via }); break; }
+      case 'mo_right': case 'mo_left': { let n = Number(this.val(b, 'N', sp)) || 0; if (b.type === 'mo_left') n = -n; sp.dir = wrapDir(sp.dir + n); sp.turned += n; this.log({ k: 'turn', s: sp.name, d: n, via, tid }); break; }
       case 'mo_goto': await this.glide(sp, Number(this.val(b, 'X', sp)) || 0, Number(this.val(b, 'Y', sp)) || 0, 0); break;
       case 'mo_point': sp.dir = wrapDir(Number(this.val(b, 'N', sp)) || 0); break;
-      case 'lo_sayfor': { const s = String(this.val(b, 'S', sp)); sp.say = s; this.log({ k: 'say', s: sp.name, t: s }); await this.sleep((Number(this.val(b, 'N', sp)) || 0) * 1000); if (this.stopped) throw new StopErr(); if (sp.say === s) sp.say = ''; this.log({ k: 'sayEnd', s: sp.name }); break; }
+      case 'lo_sayfor': { const s = String(this.val(b, 'S', sp)); sp.say = s; this.log({ k: 'say', s: sp.name, t: s }); await this.sleep((Number(this.val(b, 'N', sp)) || 0) * 1000); this.check(th); if (sp.say === s) sp.say = ''; this.log({ k: 'sayEnd', s: sp.name }); break; }
       case 'lo_say': { const s = String(this.val(b, 'S', sp)); sp.say = s; this.log({ k: 'say', s: sp.name, t: s }); break; }
       case 'lo_show': sp.visible = true; this.log({ k: 'show', s: sp.name, via }); break;
       case 'lo_hide': sp.visible = false; this.log({ k: 'hide', s: sp.name, via }); break;
@@ -637,16 +646,16 @@ class Runtime {
       case 'pe_down': sp.pen = true; break;
       case 'pe_up': sp.pen = false; break;
       case 'ct_wait': await this.sleep((Number(this.val(b, 'N', sp)) || 0) * 1000); break;
-      case 'ct_repeat': { const n = Math.round(Number(this.val(b, 'N', sp)) || 0), body = this.inp(b, 'DO'); for (let i = 0; i < n; i++) { await this.exec(body, sp, via); await this.frame(); this.check(); } break; }
-      case 'ct_forever': { const body = this.inp(b, 'DO'); for (;;) { await this.exec(body, sp, via); await this.frame(); this.check(); } }
-      case 'ct_if': if (this.cond(b, 'COND', sp)) await this.exec(this.inp(b, 'DO'), sp, via); break;
-      case 'ct_ifelse': await this.exec(this.inp(b, this.cond(b, 'COND', sp) ? 'DO' : 'ELSE'), sp, via); break;
+      case 'ct_repeat': { const n = Math.round(Number(this.val(b, 'N', sp)) || 0), body = this.inp(b, 'DO'); for (let i = 0; i < n; i++) { await this.exec(body, sp, th); await this.frame(); this.check(th); } break; }
+      case 'ct_forever': { const body = this.inp(b, 'DO'); for (;;) { await this.exec(body, sp, th); await this.frame(); this.check(th); } }
+      case 'ct_if': if (this.cond(b, 'COND', sp)) await this.exec(this.inp(b, 'DO'), sp, th); break;
+      case 'ct_ifelse': await this.exec(this.inp(b, this.cond(b, 'COND', sp) ? 'DO' : 'ELSE'), sp, th); break;
       case 'ct_stop': this.log({ k: 'stopAll' }); this.stopAll = true; this.stop(); throw new StopErr();
       case 'va_set': { const v = this.val(b, 'N', sp); w.vars[f.VAR] = isNum(v) ? Number(v) : v; this.log({ k: 'var', n: f.VAR, v: w.vars[f.VAR] }); break; }
       case 'va_change': { w.vars[f.VAR] = (Number(w.vars[f.VAR]) || 0) + (Number(this.val(b, 'N', sp)) || 0); this.log({ k: 'var', n: f.VAR, v: w.vars[f.VAR] }); break; }
       case 'li_clear': w.lists[f.LIST] = []; this.log({ k: 'list', n: f.LIST }); break;
       case 'li_add': (w.lists[f.LIST] = w.lists[f.LIST] || []).push(String(this.val(b, 'S', sp))); this.log({ k: 'list', n: f.LIST }); break;
-      case 'ev_bcast': { const m = f.MSG; this.log({ k: 'bcast', m }); for (const [s2, t] of this.hats('ev_recv', t => t.fields && t.fields.MSG === m)) this.spawn(s2, t); break; }
+      case 'ev_bcast': { const m = f.MSG; this.log({ k: 'bcast', m }); for (const [s2, t] of this.hats('ev_recv', t => t.fields && t.fields.MSG === m)) this.spawn(s2, t, true); break; }
     }
   }
 }
@@ -680,13 +689,16 @@ const H = {
     const len = s.map(l => Math.hypot(l.x2 - l.x1, l.y2 - l.y1));
     const head = s.map(l => Math.atan2(l.y2 - l.y1, l.x2 - l.x1) * 180 / Math.PI);
     const turns = head.map((h, i) => { let d = head[(i + 1) % n] - h; d = ((d + 540) % 360) - 180; return d; });
-    const ok = len.every(v => Math.abs(v - len[0]) < 2) && near(s[n - 1].x2, s[n - 1].y2, s[0].x1, s[0].y1) && s.every((l, i) => i === 0 || near(s[i - 1].x2, s[i - 1].y2, l.x1, l.y1)) && turns.every(d => Math.abs(d - turns[0]) < 2);
+    // 轉角都一樣、而且加起來剛好一圈（擋掉「左轉 120」把三角形描兩次、或「轉 180」來回描線）
+    const ok = len.every(v => Math.abs(v - len[0]) < 2) && near(s[n - 1].x2, s[n - 1].y2, s[0].x1, s[0].y1) && s.every((l, i) => i === 0 || near(s[i - 1].x2, s[i - 1].y2, l.x1, l.y1)) && turns.every(d => Math.abs(d - turns[0]) < 2) && Math.abs(Math.abs(turns.reduce((a, d) => a + d, 0)) - 360) < 3;
     return { ok, count: s.length };
   },
   // 從「當收到訊息」執行緒出現（不是在綠旗程式裡直接顯示）
   shownByRecv: (r, name) => r.trace.find(e => e.k === 'show' && e.s === name && e.via === 'ev_recv'),
   sayEndAt: (r, name) => { const e = r.trace.find(x => x.k === 'sayEnd' && x.s === name); return e ? e.time : null; },
-  turnedByRecv: (r, name) => r.trace.filter(e => e.k === 'turn' && e.s === name && e.via === 'ev_recv').reduce((a, e) => a + e.d, 0),
+  lastSayEndAt: (r, name) => { const e = r.trace.filter(x => x.k === 'sayEnd' && x.s === name).pop(); return e ? e.time : null; },
+  // 「收到訊息」程式轉的角度：以單一次執行為準（廣播兩次各轉半圈不算轉滿一圈）
+  turnedByRecv: (r, name) => { const m = {}; r.trace.forEach(e => { if (e.k === 'turn' && e.s === name && e.via === 'ev_recv') m[e.tid] = (m[e.tid] || 0) + e.d; }); const v = Object.values(m); return v.length ? v.reduce((a, d) => Math.abs(d) > Math.abs(a) ? d : a, 0) : 0; },
   varHist: (r, n) => r.trace.filter(e => e.k === 'var' && e.n === n).map(e => e.v),
 };
 const PASS = { ok: true };
@@ -762,7 +774,7 @@ const LEVELS = [
   story: '旋轉木馬要在地上畫出新的軌道。先讀讀程式，猜猜看木馬會畫出什麼形狀？',
   goal: '讀程式，預測畫出的形狀',
   sprites: [{ ...HORSE, code: () => [at(24, 24, K.flag(K.clear(), K.goto(-50, 50), K.point(90), K.pdown(), id(K.rep(4, K.move(100), K.right(90)), 'H'), K.pup()))] }],
-  quiz: { q: '木馬會畫出什麼形狀？', opts: ['➖ 一條直線', '🔺 三角形', '⬜ 正方形', '▭ 長方形'], ans: 2 },
+  quiz: { q: '木馬會畫出什麼形狀？', opts: ['➖ 一條直線', '🔺 三角形', '⬜ 正方形', '⭐ 星形'], ans: 2 },
   hl: [[0, 'H']],
   hints: ['數一數：「移動 100 點」總共會執行幾次？', '每次都轉 90 度，也就是一個<b>直角</b>。', '4 條一樣長的邊＋4 個直角＝<b>正方形</b>。'],
   explain: '重複 4 次「走 100 點、右轉 90 度」，走了 4 條一樣長的邊、轉了 4 個直角，就是正方形。' },
@@ -927,7 +939,9 @@ const LEVELS = [
   check: async run => {
     const a = await run({ vars: { 收入: 800 } }), b = await run({ vars: { 收入: 0 } }), msgs = [];
     if (!(a.w.vars['收入'] === 300 && b.w.vars['收入'] === 300 && incomeGrows(a))) msgs.push('💰 收入還是算錯了（要從 0 開始，每張票加 100）');
-    if (!H.shownByRecv(a, '煙火')) msgs.push('🎆 主持人說完話，煙火沒有在「收到訊息」後出現');
+    const sh = H.shownByRecv(a, '煙火'), endT = H.lastSayEndAt(a, '主持人');
+    if (!sh) msgs.push('🎆 主持人說完話，煙火沒有在「收到訊息」後出現');
+    else if (endT == null || sh.time < endT) msgs.push('🎆 煙火太早出現了，要等主持人「說完話」才廣播');
     // 單獨測煙火：假裝它收到廣播，看看會轉幾度
     const c = await run({ only: [1], forceRecv: [1] }), t = Math.abs(H.turnedByRecv(c, '煙火'));
     if (!(t >= 360 && t % 360 === 0)) msgs.push(`🔄 煙火收到訊息後只轉了 ${t} 度，沒有剛好轉滿一整圈`);
@@ -965,6 +979,8 @@ const finished = L => { const s = P.lv[L.id]; return !!(s && (s.done || s.skip))
 const unlocked = L => L.i === 0 || finished(LEVELS[L.i - 1]);
 
 /* ---------------- 排行榜 ---------------- */
+// 和 Code.gs 的 BAD_WORDS 一致：登入時先擋，免得整場成績都上傳失敗
+const BAD_WORDS = ['笨蛋', '白痴', '白癡', '智障', '腦殘', '低能', '靠北', '靠杯', '幹你', '操你', '三小', '垃圾', '去死', '王八', '賤', '廢物', '雞掰', '機掰', 'fuck', 'shit', 'bitch'];
 // 這台電腦的裝置碼：排行榜用它確認「這個座號是同一個人」
 function devTok() {
   let t = '';
@@ -976,10 +992,11 @@ function upload(retry) {
   const s = summary();
   const q = new URLSearchParams({ action: 'submit', pid: P.pid, cls: P.cls, seat: P.seat, nick: P.nick, tok: devTok(), score: s.score, cleared: s.cleared, time: s.time, hints: s.hints });
   fetch(SCRIPT_URL + '?' + q).then(r => r.json()).then(d => {
-    if (d && d.ok && d.rank) setTimeout(() => toast(`🏆 成績已上傳！目前全校第 ${d.rank} 名`), 1200);
-    else if (d && d.taken) setTimeout(() => toast('⚠️ ' + d.error), 1200);
-    else if (!retry) setTimeout(() => upload(true), 5000);
-  }).catch(() => { if (!retry) setTimeout(() => upload(true), 5000); });
+    if (d && d.ok) { if (d.rank) setTimeout(() => toast(`🏆 成績已上傳！目前全校第 ${d.rank} 名`), 1200); return; }
+    if (d && d.error === '送出太頻繁' && !retry) { setTimeout(() => upload(true), 5000); return; }
+    // 其他原因：告訴學生，不要默默失敗（下一關過關時會再上傳一次）
+    setTimeout(() => toast('⚠️ 成績沒有上傳成功：' + ((d && d.error) || '請稍後再試') + '。可以請老師幫忙看看。', 4500), 1200);
+  }).catch(() => { if (!retry) setTimeout(() => upload(true), 5000); else toast('⚠️ 網路有問題，成績暫時沒有上傳，下一關過關時會再試一次。', 4000); });
 }
 function fetchTop(cls) {
   const q = new URLSearchParams({ action: 'top', cls: cls || '', pid: P && !P.guest ? P.pid : '' });
@@ -1030,6 +1047,7 @@ function initLogin() {
     if (!/^\d{3,4}$/.test(cls)) return $('#loginErr').textContent = '班級請輸入 3 位數字，例如 501';
     if (!(seat >= 1 && seat <= 40)) return $('#loginErr').textContent = '座號請輸入 1～40';
     if (!nick) return $('#loginErr').textContent = '請輸入名字';
+    if (BAD_WORDS.some(w => nick.toLowerCase().replace(/\s/g, '').includes(w))) return $('#loginErr').textContent = '名字裡有不適合的字詞，請換一個名字';
     const pid = cls + '-' + seat;
     const old = store('park1_' + pid);
     login(old ? Object.assign(old, { nick }) : { pid, cls, seat, nick, lv: {}, notes: {} });
@@ -1224,7 +1242,7 @@ function showEnding() {
   <div style="font-size:40px;font-weight:900;color:var(--pri)">${s.score} 分</div>
   <p>通關 ${s.cleared} / 20 關｜總用時 ${fmtT(s.time)}｜用了 ${s.hints} 次提示</p>
   ${skipped ? `<p style="color:var(--sub)">還有 ${skipped} 關跳過了，回去挑戰可以再加分喔！</p>` : '<p>🏅 全部通關，你是真正的除錯工程師！</p>'}</div>
-  <div class="row"><button class="btn ghost" id="mB">🏆 看排行榜</button><button class="btn" id="mOk">太棒了！</button></div>`);
+  <div class="row"><button class="btn ghost" id="mB">🏆 看排行榜</button><button class="btn" id="mOk">太棒了！</button></div>`, null, true);
   $('#mOk').onclick = closeModal; $('#mB').onclick = () => showBoard();
 }
 
@@ -1234,9 +1252,9 @@ function showEnding() {
 let ws = null;
 function openLevel(L) {
   if (!unlocked(L)) return;
-  stopFlash(); stopRun();
-  const st = lvSt(L);
-  CUR = { L, st, practice: !!st.done, tab: 0, states: L.sprites.map(s => ({ blocks: { languageVersion: 0, blocks: s.code() } })), world: makeWorld(L), rt: null, phase: L.mode === 'CB' ? 'quiz' : null, solved: false, wrongOpts: {}, testIdx: 0, demo: false };
+  keepDraft(); stopFlash(); stopRun();
+  const st = lvSt(L), dr = !st.done && P.draft && P.draft[L.id];
+  CUR = { L, st, practice: !!st.done, tab: dr ? dr.tab || 0 : 0, states: dr ? dr.states : L.sprites.map(s => ({ blocks: { languageVersion: 0, blocks: s.code() } })), world: makeWorld(L), rt: null, phase: dr && dr.phase ? dr.phase : (L.mode === 'CB' ? 'quiz' : null), solved: false, wrongOpts: {}, testIdx: 0, demo: false, lastFail: '' };
   show('scrLevel');
   $('#lvId').textContent = L.id; $('#lvName').textContent = L.title; $('#lvMode').textContent = MODE_NAME[L.mode] + (CUR.practice ? '｜練習模式' : '');
   renderTabs(); buildWs(); renderTask(); renderTests(); updateHud();
@@ -1244,12 +1262,14 @@ function openLevel(L) {
   $('#stNote').innerHTML = CUR.practice ? '這關已經過關了，現在是<b>練習模式</b>，不會改變分數。' : '';
   const firstOfZone = !P.notes[L.z];
   if (firstOfZone) { P.notes[L.z] = 1; saveP(); showNote(L.z); }
+  else if (dr) toast('↩ 已經幫你保留上次改到一半的程式');
 }
 function isLocked() { const m = CUR.L.mode; return m === 'A' || m === 'A2' || m === 'C' || (m === 'CB' && CUR.phase === 'quiz'); }
 function buildWs() {
   if (ws) { ws.dispose(); ws = null; }
-  const locked = isLocked(), L = CUR.L;
-  const opts = { renderer: 'zelos', theme: THEME, media: 'https://cdn.jsdelivr.net/npm/blockly@10.4.3/media/', trashcan: !locked, sounds: false, zoom: { controls: true, wheel: false, startScale: locked ? 0.95 : 0.85, maxScale: 1.6, minScale: 0.4 }, move: { scrollbars: true, drag: true, wheel: true }, grid: { spacing: 28, length: 2, colour: '#e3e6ee', snap: false } };
+  const locked = isLocked(), L = CUR.L, narrow = innerWidth < 1200;
+  // 窄螢幕把積木縮小一點，積木區（左邊選單）也會跟著變窄，程式區才放得下
+  const opts = { renderer: 'zelos', theme: THEME, media: 'https://cdn.jsdelivr.net/npm/blockly@10.4.3/media/', trashcan: !locked, sounds: false, zoom: { controls: true, wheel: false, startScale: locked ? (narrow ? 0.82 : 0.95) : (narrow ? 0.7 : 0.85), maxScale: 1.6, minScale: 0.4 }, move: { scrollbars: true, drag: true, wheel: true }, grid: { spacing: 28, length: 2, colour: '#e3e6ee', snap: false } };
   if (!locked && L.toolbox) opts.toolbox = { kind: 'flyoutToolbox', contents: L.toolbox().map(b => ({ kind: 'block', ...b })) };
   Blockly.config.snapRadius = 40; Blockly.config.connectingSnapRadius = 60;
   ws = Blockly.inject($('#ws'), opts);
@@ -1264,7 +1284,16 @@ function loadTab() {
   try { ws.clear(); Blockly.serialization.workspaces.load(CUR.states[CUR.tab], ws); } finally { Blockly.Events.enable(); }
   if (isLocked()) ws.getAllBlocks(false).forEach(b => { b.setMovable(false); b.setDeletable(false); b.setEditable(false); });
 }
-function saveTab() { if (ws && CUR) CUR.states[CUR.tab] = Blockly.serialization.workspaces.save(ws); }
+// 鎖住的積木不能改，不用存（存了會把「鎖住」一起存進去，6-2 進入動手修時就拖不動）
+function saveTab() { if (ws && CUR && !isLocked()) CUR.states[CUR.tab] = Blockly.serialization.workspaces.save(ws); }
+// 離開關卡時保留改到一半的程式，下次回來接著修
+function keepDraft() {
+  if (!CUR || !P || CUR.solved || CUR.practice || isLocked()) return;
+  saveTab();
+  P.draft = P.draft || {};
+  P.draft[CUR.L.id] = { states: clone(CUR.states), phase: CUR.phase, tab: CUR.tab };
+  saveP();
+}
 function renderTabs() {
   const L = CUR.L;
   if (L.sprites.length < 2) { $('#tabs').innerHTML = ''; return; }
@@ -1284,7 +1313,7 @@ function renderTask() {
   h += `<div class="how">${MODE_HOW[mode]}</div>`;
   if ((mode === 'C' || mode === 'A2') && L.quiz) {
     h += `<div class="quizQ">❓ ${L.quiz.q}</div><div class="opts">` + L.quiz.opts.map((o, i) => {
-      const lab = Array.isArray(o) ? o[0] : o, chip = L.quiz.chip ? ` chip" style="background:${COL[o[1]]}` : '';
+      const lab = Array.isArray(o) ? o[0] : o, chip = L.quiz.chip ? ` chip" style="--c:${COL[o[1]]}` : '';
       return `<button class="opt${CUR.wrongOpts[i] ? ' wrong' : ''}${chip}" data-i="${i}" ${CUR.wrongOpts[i] || CUR.solved ? 'disabled' : ''}>${esc(lab)}</button>`;
     }).join('') + '</div>';
   }
@@ -1300,7 +1329,7 @@ function renderTask() {
   $('#btnGo').disabled = mode === 'C' && !CUR.solved;
   $('#btnGo').title = $('#btnGo').disabled ? '先猜猜看答案，選好後會自動執行' : '執行（綠旗）';
 }
-function fb(msg, kind) { const f = $('#fb'); if (!f) return; f.className = 'fb show ' + kind; f.innerHTML = msg; }
+function fb(msg, kind) { const f = $('#fb'); if (!f) return; f.className = 'fb show ' + kind; f.innerHTML = msg; try { f.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} }
 function renderHints() {
   const L = CUR.L, n = CUR.st.h || 0;
   $('#hintBox').innerHTML = L.hints.slice(0, n).map((t, i) => `<div class="hintItem ${i === 1 ? 'clk' : ''}" data-i="${i}">💡 ${i + 1}. ${t}${i === 1 ? '<br><span style="font-size:13px;color:#8a6d00">（點這裡讓積木再閃一次）</span>' : ''}</div>`).join('');
@@ -1323,6 +1352,7 @@ function updateHud() {
 setInterval(() => {
   if (!CUR || !$('#scrLevel').classList.contains('on') || CUR.practice || CUR.solved) return;
   if (document.visibilityState !== 'visible') return;
+  if ($('#modal').classList.contains('on')) return;   // 看筆記、確認視窗時不計時
   CUR.st.t = (CUR.st.t || 0) + 1;
   if (CUR.st.t % 5 === 0) saveP();
   updateHud();
@@ -1357,7 +1387,7 @@ $('#cv').onclick = ev => {
 };
 
 /* ---------------- 作答 ---------------- */
-function wrong(msg) { if (!CUR.practice) { CUR.st.w = (CUR.st.w || 0) + 1; saveP(); updateHud(); } fb(msg + (CUR.practice ? '' : '（−5 分）'), 'bad'); }
+function wrong(msg) { if (!CUR.practice) { CUR.st.w = (CUR.st.w || 0) + 1; saveP(); updateHud(); } fb(msg + (CUR.practice ? '' : '（−5 分）'), 'bad'); toast(CUR.practice ? '🙅 再試試看！' : '🙅 還不對喔（−5 分）'); }
 function pickBlock(bid) {
   let b = ws.getBlockById(bid), hit = false;
   while (b) { if (CUR.L.answer.includes(b.id)) { hit = true; break; } b = b.outputConnection ? b.getParent() : b.getSurroundParent(); }
@@ -1374,8 +1404,10 @@ async function pickOpt(i) {
   // C：先猜再跑
   document.querySelectorAll('.opt').forEach(b => b.disabled = true);
   fb('🏁 執行程式驗證中……', 'info');
-  const rt = await runVisible(getProgs());
-  if (!CUR || CUR.L !== L) return;
+  CUR.world = makeWorld(L); renderTests();   // 每次猜都從頭跑，舞台結果才會和答案一致
+  const me = CUR;
+  await runVisible(getProgs());
+  if (CUR !== me) return;
   if (ok) {
     document.querySelector(`.opt[data-i="${i}"]`).classList.add('right');
     if (L.mode === 'CB') { CUR.phase = 'fix'; CUR.wrongOpts = {}; buildWs(); renderTask(); toast('猜對了！現在動手把它修好 🔧'); }
@@ -1391,13 +1423,19 @@ async function submitFix() {
     fb('🧩 有積木沒有接到程式上喔！把它接到程式下面，或拖回左邊的積木區刪掉，再按一次送出檢查（不扣分）。', 'info');
     return;
   }
-  $('#btnCheck').disabled = true;
+  // 和上次檢查沒過的程式一模一樣：不再扣分
+  const sig = JSON.stringify(progs, (k, v) => (k === 'x' || k === 'y' || k === 'id') ? undefined : v);
+  if (sig === CUR.lastFail) { fb('🤔 程式和上次檢查的一樣，還沒有改喔！先動手修改，再送出檢查（這次不扣分）。', 'info'); toast('程式還沒有改喔！'); return; }
+  const me = CUR, btn = $('#btnCheck');
+  btn.disabled = true; btn.textContent = '⏳ 檢查中…';
   let r;
   try { r = await L.check(over => runFast(L, progs, over)); } catch (e) { console.error(e); r = FAIL('檢查時發生錯誤，請再試一次。'); }
-  if (!CUR || CUR.L !== L) return;
-  if ($('#btnCheck')) $('#btnCheck').disabled = false;
+  if (CUR !== me) return;
   if (r.ok) { success(); return; }
+  CUR.lastFail = sig;
   wrong('🔧 還沒修好：' + r.msg);
+  // 稍等一下才能再按，避免連按
+  setTimeout(() => { if (CUR === me && $('#btnCheck')) { $('#btnCheck').disabled = false; $('#btnCheck').textContent = '✅ 修好了！送出檢查'; } }, 1200);
   if (!CUR.solved) runVisible(progs);
 }
 function restoreCode() {
@@ -1408,6 +1446,7 @@ function restoreCode() {
 function success() {
   const L = CUR.L, st = CUR.st;
   CUR.solved = true;
+  if (P.draft && P.draft[L.id]) { delete P.draft[L.id]; saveP(); }
   document.querySelectorAll('.opt').forEach(b => b.disabled = true);
   if ($('#btnCheck')) $('#btnCheck').disabled = true;
   $('#btnGo').disabled = false;
@@ -1422,12 +1461,12 @@ function success() {
   }
   setTimeout(() => {
     openModal(`<div class="confetti">${'<i></i>'.repeat(16)}</div><div style="text-align:center;font-size:50px" class="burstBg"><span class="cheer">${L.boss ? '🏆🎆🏆' : '🎉🔧✨'}</span></div><h2 style="text-align:center">${L.boss ? '打敗 Bug 小精靈！' : '修好了！'}</h2>${body}<div class="explain">💬 ${L.explain}</div>
-    <div class="row"><button class="btn ghost" id="mMap">回地圖</button>${next ? '<button class="btn" id="mNext">下一關 ▶</button>' : ''}</div>`);
+    <div class="row"><button class="btn ghost" id="mMap">回地圖</button>${next ? '<button class="btn" id="mNext">下一關 ▶</button>' : ''}</div>`, null, true);
     $('#mMap').onclick = () => { closeModal(); leaveLevel(); };
     if (next) $('#mNext').onclick = () => { closeModal(); if (next.z !== L.z) { leaveLevel(); selZone = next.z; } openLevel(next); };
   }, L.mode === 'A' || L.mode === 'A2' ? 500 : 900);
 }
-function leaveLevel() { stopFlash(); stopRun(); saveP(); CUR = null; openMap(); }
+function leaveLevel() { keepDraft(); stopFlash(); stopRun(); saveP(); CUR = null; openMap(); }
 $('#btnBack').onclick = leaveLevel;
 $('#btnHint').onclick = () => {
   const st = CUR.st, n = st.h || 0;
@@ -1702,27 +1741,28 @@ function drawStage() {
   // 變數、清單監視器
   let my = 8;
   for (const n of L.varNames) {
-    ctx.font = 'bold 13px "Microsoft JhengHei",sans-serif';
-    const v = String(w.vars[n]), tw = ctx.measureText(n).width, vw = Math.max(28, ctx.measureText(v).width + 14);
-    ctx.fillStyle = '#f4f4f4'; ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 1; rr(8, my, tw + vw + 22, 26, 6); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#575e75'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(n, 15, my + 13);
-    ctx.fillStyle = COL.vars; rr(tw + 20, my + 4, vw, 18, 9); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(v, tw + 20 + vw / 2, my + 13);
-    my += 32;
+    // 字放大：教室筆電上舞台會縮小到約 0.65 倍，原本 13px 只剩 8px
+    ctx.font = 'bold 18px "Microsoft JhengHei",sans-serif';
+    const v = String(w.vars[n]), tw = ctx.measureText(n).width, vw = Math.max(36, ctx.measureText(v).width + 18);
+    ctx.fillStyle = '#f4f4f4'; ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 1; rr(8, my, tw + vw + 26, 34, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#3f4559'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(n, 16, my + 17);
+    ctx.fillStyle = '#e8630a'; rr(tw + 22, my + 5, vw, 24, 12); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(v, tw + 22 + vw / 2, my + 17);
+    my += 40;
   }
   for (const n of L.listNames) {
-    const items = w.lists[n] || [], bx = 340, bw = 130, bh = Math.max(60, 46 + items.length * 22);
-    ctx.fillStyle = '#f4f4f4'; ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 1; rr(bx, 8, bw, bh, 6); ctx.fill(); ctx.stroke();
-    ctx.font = 'bold 13px "Microsoft JhengHei",sans-serif'; ctx.fillStyle = '#575e75'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n, bx + bw / 2, 20);
-    items.forEach((it, i) => { const y = 32 + i * 22; ctx.fillStyle = '#575e75'; ctx.textAlign = 'left'; ctx.font = '12px sans-serif'; ctx.fillText(i + 1, bx + 6, y + 9); ctx.fillStyle = COL.lists; rr(bx + 22, y, bw - 30, 19, 4); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Microsoft JhengHei",sans-serif'; ctx.fillText(it, bx + 28, y + 10); });
-    ctx.fillStyle = '#575e75'; ctx.font = '12px "Microsoft JhengHei",sans-serif'; ctx.textAlign = 'center'; ctx.fillText('長度 ' + items.length, bx + bw / 2, 8 + bh - 10);
+    const items = w.lists[n] || [], bw = 150, bx = 480 - bw - 8, RH = 27, bh = Math.max(70, 58 + items.length * RH);
+    ctx.fillStyle = '#f4f4f4'; ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 1; rr(bx, 8, bw, bh, 7); ctx.fill(); ctx.stroke();
+    ctx.font = 'bold 17px "Microsoft JhengHei",sans-serif'; ctx.fillStyle = '#3f4559'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n, bx + bw / 2, 23);
+    items.forEach((it, i) => { const y = 38 + i * RH; ctx.fillStyle = '#3f4559'; ctx.textAlign = 'left'; ctx.font = 'bold 15px sans-serif'; ctx.fillText(i + 1, bx + 7, y + 12); ctx.fillStyle = '#e0480f'; rr(bx + 26, y, bw - 34, 24, 5); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 17px "Microsoft JhengHei",sans-serif'; ctx.fillText(it, bx + 33, y + 12); });
+    ctx.fillStyle = '#3f4559'; ctx.font = 'bold 16px "Microsoft JhengHei",sans-serif'; ctx.textAlign = 'center'; ctx.fillText('長度 ' + items.length, bx + bw / 2, 8 + bh - 12);
   }
   if (CUR.demo) { ctx.fillStyle = 'rgba(43,182,115,.92)'; rr(150, 326, 180, 26, 13); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 14px "Microsoft JhengHei",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('👀 示範：正確的效果', 240, 339); }
 }
 function bubble(s) {
   ctx.save();
-  ctx.font = 'bold 16px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+  ctx.font = 'bold 19px "Microsoft JhengHei","Noto Sans TC",sans-serif';
   // ---- 自動換行（中文逐字、英文盡量在空白斷行），最多 2 行 ----
-  const MAX = 196, lines = [];
+  const MAX = 220, lines = [];
   let cur = '';
   for (const ch of String(s.say)) {
     if (ch === '\n') { lines.push(cur); cur = ''; continue; }
@@ -1740,7 +1780,7 @@ function bubble(s) {
     lines[1] = l + '…';
   }
   // ---- 位置：預設在角色右上方，太靠右就翻到左邊（像 Scratch） ----
-  const LH = 21, tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+  const LH = 25, tw = Math.max(...lines.map(l => ctx.measureText(l).width));
   const bw = Math.max(44, Math.ceil(tw) + 24), bh = lines.length * LH + 12;
   const sx = 240 + s.x, top = 180 - s.y - s.size * 0.5;
   const right = sx + s.size * 0.25 + bw <= 476;
@@ -1771,7 +1811,7 @@ function bubble(s) {
    ===================================================================== */
 let THEME;
 window.addEventListener('resize', () => { if (ws) Blockly.svgResize(ws); });
-$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal' && !modalSticky) closeModal(); });
 $('#btnBoard').onclick = () => showBoard();
 $('#btnStory').onclick = showStory;
 $('#btnLogout').onclick = () => { P = null; store('park1_last', ''); initLogin(); };
