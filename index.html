@@ -336,6 +336,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
     <div class="field"><label>名字</label><input id="inNick" maxlength="8" placeholder="名字或暱稱（8 個字內）"></div>
     <div class="err" id="loginErr"></div>
     <button class="btn" id="btnLogin" style="width:100%;font-size:18px;padding:12px">🔧 開始搶修！</button>
+    <button class="btn ghost" id="btnGuest" style="width:100%;margin-top:10px">🎈 訪客模式（免登入，成績不上排行榜）</button>
     <div style="margin-top:12px"><button class="linkb" id="btnTeacher">👩‍🏫 老師投影排行榜</button></div>
   </div>
 </div>
@@ -971,7 +972,7 @@ function devTok() {
   return t;
 }
 function upload(retry) {
-  if (!SCRIPT_URL || !P) return;
+  if (!SCRIPT_URL || !P || P.guest) return;
   const s = summary();
   const q = new URLSearchParams({ action: 'submit', pid: P.pid, cls: P.cls, seat: P.seat, nick: P.nick, tok: devTok(), score: s.score, cleared: s.cleared, time: s.time, hints: s.hints });
   fetch(SCRIPT_URL + '?' + q).then(r => r.json()).then(d => {
@@ -981,7 +982,7 @@ function upload(retry) {
   }).catch(() => { if (!retry) setTimeout(() => upload(true), 5000); });
 }
 function fetchTop(cls) {
-  const q = new URLSearchParams({ action: 'top', cls: cls || '', pid: P ? P.pid : '' });
+  const q = new URLSearchParams({ action: 'top', cls: cls || '', pid: P && !P.guest ? P.pid : '' });
   return fetch(SCRIPT_URL + '?' + q).then(r => r.json());
 }
 function boardTable(d) {
@@ -993,10 +994,10 @@ function boardTable(d) {
 }
 let boardTimer = null;
 function showBoard(scope) {
-  scope = scope || 'all';
+  scope = P.guest ? 'all' : (scope || 'all');
   clearInterval(boardTimer);
-  openModal(`<h2>🏆 排行榜</h2><div style="display:flex;gap:8px"><button class="btn small ${scope === 'all' ? '' : 'ghost'}" id="bA">全校</button><button class="btn small ${scope === 'cls' ? '' : 'ghost'}" id="bC">${esc(P.cls)} 班</button><div class="sp"></div><span style="font-size:13px;color:var(--sub);align-self:center">每 15 秒自動更新</span></div><div id="bL" style="margin-top:12px">讀取中…</div><div class="row"><button class="btn" id="bX">關閉</button></div>`, () => clearInterval(boardTimer));
-  $('#bA').onclick = () => showBoard('all'); $('#bC').onclick = () => showBoard('cls'); $('#bX').onclick = closeModal;
+  openModal(`<h2>🏆 排行榜</h2>${P.guest ? `<div class="fb show info" style="margin:0 0 10px">🎈 你是訪客，成績不會上榜。你目前 <b>${summary().score}</b> 分。</div>` : ''}<div style="display:flex;gap:8px"><button class="btn small ${scope === 'all' ? '' : 'ghost'}" id="bA">全校</button>${P.guest ? '' : `<button class="btn small ${scope === 'cls' ? '' : 'ghost'}" id="bC">${esc(P.cls)} 班</button>`}<div class="sp"></div><span style="font-size:13px;color:var(--sub);align-self:center">每 15 秒自動更新</span></div><div id="bL" style="margin-top:12px">讀取中…</div><div class="row"><button class="btn" id="bX">關閉</button></div>`, () => clearInterval(boardTimer));
+  $('#bA').onclick = () => showBoard('all'); if ($('#bC')) $('#bC').onclick = () => showBoard('cls'); $('#bX').onclick = closeModal;
   const s = summary();
   if (!SCRIPT_URL) { $('#bL').innerHTML = `<p>排行榜還沒有設定喔！請老師依照「排行榜設定說明」完成設定。</p><p>你目前的成績：<b>${s.score}</b> 分（通關 ${s.cleared} 關）</p>`; return; }
   const load = () => fetchTop(scope === 'cls' ? P.cls : '').then(d => { const L = $('#bL'); if (L) L.innerHTML = boardTable(d) + (d && d.myRank ? `<p>你目前是全校第 <b>${d.myRank}</b> 名。</p>` : ''); }).catch(() => { const L = $('#bL'); if (L) L.textContent = '排行榜讀取失敗，請檢查網路。'; });
@@ -1034,9 +1035,17 @@ function initLogin() {
     login(old ? Object.assign(old, { nick }) : { pid, cls, seat, nick, lv: {}, notes: {} });
   };
   $('#btnTeacher').onclick = () => { location.search = '?board=1'; };
+  $('#btnGuest').onclick = () => {
+    const old = store('park1_guest');
+    if (!old || !Object.keys(old.lv || {}).length) return login(newGuest());
+    openModal('<h2>🎈 訪客模式</h2><p>這台電腦上有之前的訪客進度，要接著玩，還是從頭開始？</p><p style="color:var(--sub);font-size:14px">訪客的成績不會上傳排行榜。</p><div class="row"><button class="btn ghost" id="gNew">從頭開始</button><button class="btn" id="gOld">接著玩</button></div>');
+    $('#gOld').onclick = () => { closeModal(); login(old); };
+    $('#gNew').onclick = () => { closeModal(); login(newGuest()); };
+  };
 }
+function newGuest() { return { pid: 'guest', guest: true, cls: '', seat: '', nick: '訪客', lv: {}, notes: {} }; }
 function login(p) {
-  P = p; saveP(); store('park1_last', P.pid);
+  P = p; saveP(); if (!P.guest) store('park1_last', P.pid);
   openMap();
   if (!P.intro) { P.intro = 1; saveP(); showStory(); }
 }
@@ -1062,7 +1071,7 @@ function zoneState(z) {
 function openMap() {
   show('scrMap');
   const s = summary();
-  $('#mapPlayer').textContent = `🧑‍🔧 ${P.cls} 班 ${P.seat} 號 ${P.nick}`;
+  $('#mapPlayer').textContent = P.guest ? '🎈 訪客（不上排行榜）' : `🧑‍🔧 ${P.cls} 班 ${P.seat} 號 ${P.nick}`;
   $('#mapScore').textContent = s.score; $('#mapDone').textContent = s.cleared;
   const cur = LEVELS.find(L => !finished(L));
   if (!zoneState(selZone).open) selZone = cur ? cur.z : 6;
@@ -1211,7 +1220,7 @@ function showNote(z, then) {
 function showEnding() {
   const s = summary(), skipped = LEVELS.filter(L => P.lv[L.id] && P.lv[L.id].skip && !P.lv[L.id].done).length;
   openModal(`<div style="text-align:center"><div style="font-size:60px">🎆🎡🎆</div><h2>遊樂園準時開幕了！</h2>
-  <p>謝謝見習工程師 <b>${esc(P.nick)}</b> 打敗了 Bug 小精靈！</p>
+  <p>謝謝見習工程師 <b>${esc(P.nick)}</b> 打敗了 Bug 小精靈！</p>${P.guest ? '<p style="color:var(--sub)">（訪客模式：成績不會上排行榜。想上榜，請用班級座號登入再玩一次！）</p>' : ''}
   <div style="font-size:40px;font-weight:900;color:var(--pri)">${s.score} 分</div>
   <p>通關 ${s.cleared} / 20 關｜總用時 ${fmtT(s.time)}｜用了 ${s.hints} 次提示</p>
   ${skipped ? `<p style="color:var(--sub)">還有 ${skipped} 關跳過了，回去挑戰可以再加分喔！</p>` : '<p>🏅 全部通關，你是真正的除錯工程師！</p>'}</div>
